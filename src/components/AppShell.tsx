@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Navbar from './Navbar';
 import MyAppointmentsModal from './MyAppointmentsModal';
 import BlogsModal from './BlogsModal';
+import { navigateTo } from '../utils/navigation';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -48,9 +49,29 @@ export default function AppShell({ children }: AppShellProps) {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-4 text-xs text-sprout/70">
-            <span>Secure SSL Encrypted</span>
+            <button
+              onClick={() => navigateTo('/')}
+              className="hover:text-white transition-colors cursor-pointer"
+              id="footer-public-link"
+            >
+              Public Sanctuary
+            </button>
             <span className="hidden sm:inline">•</span>
-            <span>No Cookies / No Logs Collected</span>
+            <button
+              onClick={() => navigateTo('/doctor/login')}
+              className="hover:text-white transition-colors cursor-pointer"
+              id="footer-doctor-link"
+            >
+              Doctor Portal
+            </button>
+            <span className="hidden sm:inline">•</span>
+            <button
+              onClick={() => navigateTo('/admin/login')}
+              className="hover:text-white transition-colors cursor-pointer"
+              id="footer-admin-link"
+            >
+              Admin Portal
+            </button>
             <span className="hidden sm:inline">•</span>
             <span>© 2026 Hitha Sri Lanka</span>
           </div>
