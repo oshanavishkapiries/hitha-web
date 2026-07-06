@@ -8,7 +8,7 @@ export default function LandingPage() {
     <div className="bg-cream min-h-screen">
       {/* Hero Section */}
       <section className="relative overflow-visible bg-gradient-to-b from-[#142B22] to-[#1E4B3A] text-white pt-20 pb-28 px-4 sm:px-6 lg:px-8">
-        {/* Background Image with top-alignment and linear gradient mask */}
+        {/* Background Image and Abstract Shapes with clipping container */}
         <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
           <img
             src="https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?q=80&w=1600&auto=format&fit=crop"
@@ -20,11 +20,10 @@ export default function LandingPage() {
               WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 45%, rgba(0,0,0,0) 90%)',
             }}
           />
+          {/* Subtle background abstract shapes clipped within container */}
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#8FCB84] rounded-full filter blur-[120px] opacity-10" />
+          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-[#C9DFC7] rounded-full filter blur-[100px] opacity-10" />
         </div>
-
-        {/* Subtle background abstract shapes */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#8FCB84] rounded-full filter blur-[120px] opacity-10 pointer-events-none" />
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-[#C9DFC7] rounded-full filter blur-[100px] opacity-10 pointer-events-none" />
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
           {/* Heading (Poppins ~46px) */}
