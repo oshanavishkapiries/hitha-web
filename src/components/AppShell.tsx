@@ -1,30 +1,17 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
+"use client";
 
-import { useState, useEffect } from 'react';
-import Navbar from './components/Navbar';
-import LandingPage from './components/LandingPage';
-import SearchPage from './components/SearchPage';
-import MyAppointmentsModal from './components/MyAppointmentsModal';
-import BlogsModal from './components/BlogsModal';
+import React, { useState } from 'react';
+import Navbar from './Navbar';
+import MyAppointmentsModal from './MyAppointmentsModal';
+import BlogsModal from './BlogsModal';
 
-export default function App() {
-  const [currentPath, setCurrentPath] = useState(() => window.location.pathname);
+interface AppShellProps {
+  children: React.ReactNode;
+}
+
+export default function AppShell({ children }: AppShellProps) {
   const [showAppointments, setShowAppointments] = useState(false);
   const [showBlogs, setShowBlogs] = useState(false);
-
-  useEffect(() => {
-    const handleLocationChange = () => {
-      setCurrentPath(window.location.pathname);
-    };
-
-    window.addEventListener('popstate', handleLocationChange);
-    return () => {
-      window.removeEventListener('popstate', handleLocationChange);
-    };
-  }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-cream font-sans selection:bg-sprout selection:text-forest">
@@ -36,11 +23,7 @@ export default function App() {
 
       {/* Main Page Content Area */}
       <main className="flex-grow">
-        {currentPath === '/search' ? (
-          <SearchPage />
-        ) : (
-          <LandingPage />
-        )}
+        {children}
       </main>
 
       {/* Conditional Modals */}
@@ -76,4 +59,3 @@ export default function App() {
     </div>
   );
 }
-

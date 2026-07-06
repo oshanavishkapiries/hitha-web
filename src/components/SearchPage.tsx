@@ -7,12 +7,23 @@ import HithaDatePicker from './HithaDatePicker';
 import { Filter, RotateCcw, Languages, Search, Users, CircleDollarSign, ChevronLeft, ChevronRight, Star, ShieldAlert, Calendar } from 'lucide-react';
 
 export default function SearchPage() {
-  const [filters, setFilters] = useState<FilterParams>(() => getQueryParams());
+  const [filters, setFilters] = useState<FilterParams>({
+    name: '',
+    category: '',
+    language: '',
+    gender: '',
+    minPrice: undefined,
+    maxPrice: undefined,
+    date: '',
+    page: 1,
+  });
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
-  // Synchronize filters on back/forward browser navigation
+  // Synchronize filters on mount & back/forward browser navigation
   useEffect(() => {
+    setFilters(getQueryParams());
+
     const handlePopState = () => {
       setFilters(getQueryParams());
     };

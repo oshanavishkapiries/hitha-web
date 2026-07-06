@@ -38,7 +38,7 @@ export default function SearchHeroBar() {
 
     navigateTo('/search', {
       name: name || undefined,
-      category: mappedCategory || undefined,
+      category: (mappedCategory as any) || undefined,
       date: date || undefined,
       page: 1,
     });
