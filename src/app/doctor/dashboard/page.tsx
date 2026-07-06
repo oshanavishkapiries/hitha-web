@@ -24,6 +24,7 @@ import {
   useDoctorProfile,
   useUpdateDoctorStatus,
 } from '../../../lib/service/query/useDoctor';
+import { getApiErrorMessage } from '../../../utils/errors';
 
 // Mock Patient Chats
 const initialChats = [
@@ -73,7 +74,7 @@ export default function DoctorDashboard() {
     try {
       await updateStatusMutation.mutateAsync(nextState ? "ONLINE" : "OFFLINE");
     } catch (err: any) {
-      alert(`API Error: ${err.message || 'Failed to update status on server.'}`);
+      alert(`API Error: ${getApiErrorMessage(err, 'Failed to update status on server.')}`);
     }
   };
 

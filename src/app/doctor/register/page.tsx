@@ -3,9 +3,13 @@
 import React, { useState } from 'react';
 import AppShell from '../../../components/AppShell';
 import { navigateTo } from '../../../utils/navigation';
-import { Lock, Mail, Phone, User, ShieldAlert, ArrowLeft, Stethoscope, BadgeCheck } from 'lucide-react';
+import { Lock, Mail, Phone, User, ShieldAlert, ArrowLeft, Stethoscope, BadgeCheck, Paperclip, X } from 'lucide-react';
 import { useDoctorRegister } from '../../../lib/service/query/useAuth';
+import { useUploadFile } from '../../../lib/service/query/useUpload';
 import { DoctorRegRequest } from '../../../lib/service/functions/doctor.service';
+import { getApiErrorMessage } from '../../../utils/errors';
+
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 
 const CATEGORY_OPTIONS: { value: DoctorRegRequest['category']; label: string }[] = [
   { value: 'COUNSELOR', label: 'Counselor' },
@@ -25,11 +29,28 @@ export default function DoctorRegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [category, setCategory] = useState<DoctorRegRequest['category'] | ''>('');
   const [slmcLicenseNumber, setSlmcLicenseNumber] = useState('');
+  const [certificationFiles, setCertificationFiles] = useState<File[]>([]);
   const [error, setError] = useState('');
+  const [isUploadingDocs, setIsUploadingDocs] = useState(false);
 
   const registerMutation = useDoctorRegister();
+  const uploadFileMutation = useUploadFile();
 
   const requiresSlmc = category === 'MEDICAL_OFFICER_PSYCHIATRY_DIPLOMA' || category === 'CONSULTANT_PSYCHIATRIST';
+
+  const handleCertificationFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = Array.from(e.target.files || []);
+    const tooLarge = selected.filter(f => f.size > MAX_FILE_SIZE_BYTES);
+    if (tooLarge.length > 0) {
+      setError(`${tooLarge.map(f => f.name).join(', ')} exceed${tooLarge.length === 1 ? 's' : ''} the 10MB size limit.`);
+    }
+    setCertificationFiles(prev => [...prev, ...selected.filter(f => f.size <= MAX_FILE_SIZE_BYTES)]);
+    e.target.value = '';
+  };
+
+  const removeCertificationFile = (index: number) => {
+    setCertificationFiles(prev => prev.filter((_, i) => i !== index));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,6 +74,23 @@ export default function DoctorRegisterPage() {
     }
 
     try {
+      let certifiedDocument: string | undefined;
+
+      if (certificationFiles.length > 0) {
+        setIsUploadingDocs(true);
+        try {
+          const uploadedUrls = await Promise.all(
+            certificationFiles.map(file => uploadFileMutation.mutateAsync({ file, folder: 'doctor-certifications' }))
+          );
+          certifiedDocument = uploadedUrls.join(',');
+        } catch (uploadErr: any) {
+          setError(getApiErrorMessage(uploadErr, 'Failed to upload one or more certification documents.'));
+          return;
+        } finally {
+          setIsUploadingDocs(false);
+        }
+      }
+
       const response = await registerMutation.mutateAsync({
         firstName,
         lastName,
@@ -61,6 +99,7 @@ export default function DoctorRegisterPage() {
         password,
         category,
         ...(slmcLicenseNumber.trim() ? { slmcLicenseNumber: slmcLicenseNumber.trim() } : {}),
+        ...(certifiedDocument ? { certifiedDocument } : {}),
       });
 
       if (response.success) {
@@ -69,7 +108,7 @@ export default function DoctorRegisterPage() {
         setError(response.message || 'Registration failed. Please review your details and try again.');
       }
     } catch (err: any) {
-      setError(err?.message || 'Registration request failed. Please check your connection and try again.');
+      setError(getApiErrorMessage(err, 'Registration request failed. Please check your connection and try again.'));
     }
   };
 
@@ -220,6 +259,47 @@ export default function DoctorRegisterPage() {
               </div>
             )}
 
+            <div>
+              <label className="block text-xs font-semibold text-ink-soft mb-1.5">
+                Certification Documents <span className="text-ink-soft font-normal">(optional)</span>
+              </label>
+              <label
+                htmlFor="doctor-register-certification-files"
+                className="flex items-center justify-center gap-2 w-full border border-dashed border-hairline hover:border-forest/40 rounded-xl px-4 py-4 text-xs text-ink-soft cursor-pointer transition-all"
+              >
+                <Paperclip className="w-4 h-4" />
+                <span>Click to attach SLMC certificates, degrees, or other supporting documents</span>
+              </label>
+              <input
+                type="file"
+                multiple
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={handleCertificationFilesChange}
+                className="hidden"
+                id="doctor-register-certification-files"
+              />
+              {certificationFiles.length > 0 && (
+                <ul className="mt-2 space-y-1.5">
+                  {certificationFiles.map((file, index) => (
+                    <li
+                      key={`${file.name}-${index}`}
+                      className="flex items-center justify-between bg-cream border border-hairline rounded-lg px-3 py-2 text-xs text-ink"
+                    >
+                      <span className="truncate pr-2">{file.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeCertificationFile(index)}
+                        className="text-ink-soft hover:text-red-600 cursor-pointer shrink-0"
+                        id={`doctor-register-remove-file-${index}`}
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-ink-soft mb-1.5">Password</label>
@@ -256,11 +336,16 @@ export default function DoctorRegisterPage() {
 
             <button
               type="submit"
-              disabled={registerMutation.isPending}
+              disabled={registerMutation.isPending || isUploadingDocs}
               className="w-full bg-forest hover:bg-forest/90 text-white font-sans font-bold py-3.5 px-4 rounded-xl text-sm transition-all shadow-resting hover:shadow-elevated active:scale-[0.98] flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
               id="doctor-register-submit"
             >
-              {registerMutation.isPending ? (
+              {isUploadingDocs ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>Uploading Documents...</span>
+                </>
+              ) : registerMutation.isPending ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   <span>Submitting Application...</span>

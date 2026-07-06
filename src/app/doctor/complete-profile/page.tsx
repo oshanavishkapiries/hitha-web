@@ -5,6 +5,7 @@ import AppShell from '../../../components/AppShell';
 import { navigateTo } from '../../../utils/navigation';
 import { ShieldAlert, Stethoscope, Plus, X } from 'lucide-react';
 import { useCompleteDoctorProfile } from '../../../lib/service/query/useDoctor';
+import { getApiErrorMessage } from '../../../utils/errors';
 
 const LANGUAGE_OPTIONS = ['Sinhala', 'Tamil', 'English'];
 const GENDER_OPTIONS = ['Male', 'Female', 'Other', 'Prefer not to say'];
@@ -80,7 +81,7 @@ export default function CompleteDoctorProfilePage() {
         setError(response.message || 'Failed to complete profile. Please try again.');
       }
     } catch (err: any) {
-      setError(err?.message || 'Failed to complete profile. Please check your connection and try again.');
+      setError(getApiErrorMessage(err, 'Failed to complete profile. Please check your connection and try again.'));
     }
   };
 

@@ -6,6 +6,7 @@ import AppShell from '../../../components/AppShell';
 import { navigateTo } from '../../../utils/navigation';
 import { ShieldCheck, ShieldAlert, ArrowLeft, Smartphone } from 'lucide-react';
 import { useSendVerificationCode, useVerifyVerificationCode } from '../../../lib/service/query/useAuth';
+import { getApiErrorMessage } from '../../../utils/errors';
 
 const RESEND_COOLDOWN_SECONDS = 60;
 
@@ -34,7 +35,7 @@ function VerifyPhoneContent() {
           setCooldown(RESEND_COOLDOWN_SECONDS);
         },
         onError: (err: any) => {
-          setError(err?.message || 'Failed to send verification code.');
+          setError(getApiErrorMessage(err, 'Failed to send verification code.'));
         },
       }
     );
@@ -59,7 +60,7 @@ function VerifyPhoneContent() {
           setCooldown(RESEND_COOLDOWN_SECONDS);
         },
         onError: (err: any) => {
-          setError(err?.message || 'Failed to resend verification code.');
+          setError(getApiErrorMessage(err, 'Failed to resend verification code.'));
         },
       }
     );
@@ -77,7 +78,7 @@ function VerifyPhoneContent() {
         navigateTo('/doctor/login?verified=1');
       }, 1500);
     } catch (err: any) {
-      setError(err?.message || 'Invalid or expired verification code. Please try again.');
+      setError(getApiErrorMessage(err, 'Invalid or expired verification code. Please try again.'));
     }
   };
 

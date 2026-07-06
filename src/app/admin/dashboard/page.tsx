@@ -39,6 +39,7 @@ import {
   useDoctorDetails,
 } from '../../../lib/service/query/useAdmin';
 import { useAlert } from '../../../context/AlertContext';
+import { getApiErrorMessage } from '../../../utils/errors';
 
 // Mock doctors awaiting SLMC verification as fallback/demo
 const initialPendingDocs = [
@@ -93,7 +94,7 @@ export default function AdminDashboard() {
       showAlert('Successfully approved doctor profile on secure server.', 'success');
       refetchRealDocs();
     } catch (err: any) {
-      showAlert(`API Error: ${err.message || 'Failed to approve doctor status.'}`, 'error');
+      showAlert(`API Error: ${getApiErrorMessage(err, 'Failed to approve doctor status.')}`, 'error');
     }
   };
 
@@ -110,7 +111,7 @@ export default function AdminDashboard() {
       setActionReason('');
       refetchRealDocs();
     } catch (err: any) {
-      showAlert(`API Error: ${err.message || 'Failed to reject doctor profile.'}`, 'error');
+      showAlert(`API Error: ${getApiErrorMessage(err, 'Failed to reject doctor profile.')}`, 'error');
     }
   };
 
@@ -127,7 +128,7 @@ export default function AdminDashboard() {
       setActionReason('');
       refetchRealDocs();
     } catch (err: any) {
-      showAlert(`API Error: ${err.message || 'Failed to suspend doctor.'}`, 'error');
+      showAlert(`API Error: ${getApiErrorMessage(err, 'Failed to suspend doctor.')}`, 'error');
     }
   };
 
@@ -142,7 +143,7 @@ export default function AdminDashboard() {
       showAlert('Doctor activated/unsuspended successfully.', 'success');
       refetchRealDocs();
     } catch (err: any) {
-      showAlert(`API Error: ${err.message || 'Failed to activate doctor.'}`, 'error');
+      showAlert(`API Error: ${getApiErrorMessage(err, 'Failed to activate doctor.')}`, 'error');
     }
   };
 

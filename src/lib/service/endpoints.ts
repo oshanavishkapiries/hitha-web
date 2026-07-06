@@ -33,5 +33,8 @@ export const ENDPOINTS = {
     removeBlockedDate: (id: string) => `/doctors/blocked-dates/${id}`,
     priceRequests: "/doctors/price-requests",
     slots: "/doctors/slots",
+  },
+  files: {
+    upload: "/files/upload",
   }
 };

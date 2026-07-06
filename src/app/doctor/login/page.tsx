@@ -6,6 +6,7 @@ import AppShell from '../../../components/AppShell';
 import { navigateTo } from '../../../utils/navigation';
 import { Lock, User, ShieldAlert, ArrowLeft, Stethoscope, ShieldCheck } from 'lucide-react';
 import { useDoctorLogin } from '../../../lib/service/query/useAuth';
+import { getApiErrorMessage } from '../../../utils/errors';
 
 function DoctorLoginContent() {
   const searchParams = useSearchParams();
@@ -40,7 +41,7 @@ function DoctorLoginContent() {
     } catch (err: any) {
       console.error("Real login failed:", err);
       setError(
-        err?.message || 'Real backend API connection failed or is currently unreachable. Please verify your internet connection or server status.'
+        getApiErrorMessage(err, 'Real backend API connection failed or is currently unreachable. Please verify your internet connection or server status.')
       );
     }
   };
@@ -128,14 +129,6 @@ function DoctorLoginContent() {
                   />
                 </div>
               </div>
-            </div>
-
-            <div className="flex items-center justify-between text-xs">
-              <label className="flex items-center space-x-2 text-ink-soft cursor-pointer">
-                <input type="checkbox" className="rounded text-forest focus:ring-forest border-hairline" defaultChecked />
-                <span>Remember this workstation</span>
-              </label>
-              <span className="text-forest hover:underline cursor-pointer font-medium">Reset credential</span>
             </div>
 
             <button

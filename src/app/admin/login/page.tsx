@@ -5,6 +5,7 @@ import AppShell from '../../../components/AppShell';
 import { navigateTo } from '../../../utils/navigation';
 import { Lock, Mail, ShieldAlert, ArrowLeft, Terminal, Play } from 'lucide-react';
 import { useAdminLogin } from '../../../lib/service/query/useAuth';
+import { getApiErrorMessage } from '../../../utils/errors';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
@@ -32,7 +33,7 @@ export default function AdminLogin() {
     } catch (err: any) {
       console.error("Real admin login failed:", err);
       setError(
-        err?.message || 'Real backend API connection failed or is currently unreachable. Please verify your internet connection or server status.'
+        getApiErrorMessage(err, 'Real backend API connection failed or is currently unreachable. Please verify your internet connection or server status.')
       );
     }
   };
