@@ -12,7 +12,9 @@ import {
   configureDoctorAvailability,
   getDoctorPriceRequests,
   submitDoctorPriceRequest,
+  completeDoctorProfileOnboarding,
   DoctorProfileUpdateRequest,
+  DoctorProfileCompletionRequest,
   BlockedDateRequest,
   AvailabilityConfigRequest,
 } from "../functions/doctor.service";
@@ -51,6 +53,24 @@ export const useUpdateDoctorProfile = () => {
       const res = await updateDoctorProfile(payload);
       if (!res.success) {
         throw new Error(res.message || "Failed to update profile");
+      }
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["doctor_profile"] });
+      queryClient.invalidateQueries({ queryKey: ["doctor_summary"] });
+    },
+  });
+};
+
+export const useCompleteDoctorProfile = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: DoctorProfileCompletionRequest) => {
+      const res = await completeDoctorProfileOnboarding(payload);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to complete profile");
       }
       return res;
     },

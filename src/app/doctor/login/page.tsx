@@ -1,16 +1,20 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import AppShell from '../../../components/AppShell';
 import { navigateTo } from '../../../utils/navigation';
-import { Lock, Mail, ShieldAlert, ArrowLeft, Stethoscope, Play } from 'lucide-react';
+import { Lock, User, ShieldAlert, ArrowLeft, Stethoscope, ShieldCheck } from 'lucide-react';
 import { useDoctorLogin } from '../../../lib/service/query/useAuth';
 
-export default function DoctorLogin() {
-  const [email, setEmail] = useState('');
+function DoctorLoginContent() {
+  const searchParams = useSearchParams();
+  const justVerified = searchParams.get('verified') === '1';
+
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  
+
   const loginMutation = useDoctorLogin();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,14 +24,18 @@ export default function DoctorLogin() {
     try {
       // 1. Attempt authenticating using the real backend API service
       const response = await loginMutation.mutateAsync({
-        identifier: email,
+        identifier,
         password: password
       });
 
       if (response.success) {
-        navigateTo('/doctor/dashboard');
+        if (response.data?.profileComplete === false) {
+          navigateTo('/doctor/complete-profile');
+        } else {
+          navigateTo('/doctor/dashboard');
+        }
       } else {
-        setError(response.message || 'Invalid SLMC-registered email or password combination.');
+        setError(response.message || 'Invalid email/phone number or password combination.');
       }
     } catch (err: any) {
       console.error("Real login failed:", err);
@@ -60,11 +68,17 @@ export default function DoctorLogin() {
               Doctor Consultation Portal
             </h2>
             <p className="mt-2 text-xs text-ink-soft max-w-sm mx-auto">
-              Access your secure, trilingual counseling sanctuary dashboard. Log in using your SLMC-verified account.
+              Access your secure, trilingual counseling sanctuary dashboard using your registered account.
             </p>
           </div>
 
           <form className="mt-8 space-y-6" onSubmit={handleSubmit} id="doctor-login-form">
+            {justVerified && !error && (
+              <div className="bg-mint/10 border border-mint/30 text-forest p-3 rounded-xl text-xs flex items-center space-x-2">
+                <ShieldCheck className="w-4 h-4 shrink-0" />
+                <span>Phone verified successfully! You can now sign in.</span>
+              </div>
+            )}
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs flex flex-col space-y-2">
                 <div className="flex items-center space-x-2">
@@ -77,19 +91,19 @@ export default function DoctorLogin() {
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-ink-soft mb-1.5">
-                  SLMC Registered Email
+                  Email or Phone Number
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-ink-soft/40">
-                    <Mail className="w-4 h-4" />
+                    <User className="w-4 h-4" />
                   </div>
                   <input
-                    type="email"
+                    type="text"
                     required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
                     className="w-full bg-cream border border-hairline focus:border-forest/50 focus:bg-white rounded-xl pl-10 pr-4 py-3 text-sm text-ink outline-none transition-all"
-                    placeholder="doctor@hitha.lk"
+                    placeholder="doctor@hitha.lk or +94 77 123 4567"
                     id="doctor-email"
                   />
                 </div>
@@ -139,10 +153,30 @@ export default function DoctorLogin() {
                 <span>Sign In to Portal</span>
               )}
             </button>
+
+            <p className="text-center text-xs text-ink-soft">
+              New to Hitha?{' '}
+              <button
+                type="button"
+                onClick={() => navigateTo('/doctor/register')}
+                className="text-forest font-semibold hover:underline cursor-pointer"
+                id="doctor-login-register-link"
+              >
+                Register as a Doctor
+              </button>
+            </p>
           </form>
         </div>
       </div>
     </AppShell>
+  );
+}
+
+export default function DoctorLogin() {
+  return (
+    <Suspense fallback={null}>
+      <DoctorLoginContent />
+    </Suspense>
   );
 }
 

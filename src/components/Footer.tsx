@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { navigateTo } from '../utils/navigation';
-import { Shield, Heart, HelpCircle, Mail, Phone, ArrowRight } from 'lucide-react';
+import { Heart, HelpCircle, Mail, Phone, ArrowRight } from 'lucide-react';
 import Logo from './Logo';
 
 export default function Footer() {
@@ -19,12 +19,6 @@ export default function Footer() {
             <p className="text-xs text-sprout/60 leading-relaxed max-w-sm font-medium">
               Sri Lanka's local, privacy-first telehealth directory. Fully compliant with SLMC guidelines, offering a safe and anonymous mental health sanctuary.
             </p>
-            <div className="flex items-center space-x-3 bg-forest/20 border border-sprout/10 rounded-2xl p-3.5 max-w-xs shadow-inner">
-              <Shield className="w-5 h-5 text-mint shrink-0 animate-pulse" />
-              <span className="text-[11px] font-semibold text-mint tracking-wide">
-                End-to-End Encrypted Escrow Active
-              </span>
-            </div>
           </div>
 
           {/* Directory Links */}

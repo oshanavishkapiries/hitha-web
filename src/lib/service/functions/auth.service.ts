@@ -30,6 +30,34 @@ export interface VerifyResetTokenRequest {
   token: string;
 }
 
+export interface SendCodeRequest {
+  identifier: string; // email or phone number
+  purpose: "REGISTER" | "EMAIL_VERIFICATION" | "PATIENT_LOGIN" | "PASSWORD_RESET";
+}
+
+export interface VerifyCodeRequest {
+  identifier: string;
+  verificationCode: string;
+}
+
+export interface VerifyCodeResponse {
+  verified: boolean;
+  accessToken?: string;
+  refreshToken?: string;
+  expiresIn?: number;
+  role?: string;
+}
+
+export const sendVerificationCode = async (payload: SendCodeRequest): Promise<ApiResponse> => {
+  const response = await axiosInstance.post<ApiResponse>(ENDPOINTS.auth.sendCode, payload);
+  return response.data;
+};
+
+export const verifyVerificationCode = async (payload: VerifyCodeRequest): Promise<ApiResponse<VerifyCodeResponse>> => {
+  const response = await axiosInstance.post<ApiResponse<VerifyCodeResponse>>(ENDPOINTS.auth.verifyCode, payload);
+  return response.data;
+};
+
 export const refreshTokens = async (payload: RefreshTokenRequest): Promise<ApiResponse<{ accessToken: string; refreshToken: string; role: string; profileComplete: boolean }>> => {
   const response = await axiosInstance.post<ApiResponse<{ accessToken: string; refreshToken: string; role: string; profileComplete: boolean }>>(
     ENDPOINTS.auth.refresh,

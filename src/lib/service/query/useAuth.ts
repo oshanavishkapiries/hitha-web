@@ -3,8 +3,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Cookies from "js-cookie";
 import { adminLogin, AdminLoginRequest } from "../functions/admin.service";
-import { doctorLogin, DoctorLoginRequest } from "../functions/doctor.service";
-import { logoutSession } from "../functions/auth.service";
+import { doctorLogin, doctorRegister, DoctorLoginRequest, DoctorRegRequest } from "../functions/doctor.service";
+import {
+  logoutSession,
+  sendVerificationCode,
+  verifyVerificationCode,
+  SendCodeRequest,
+  VerifyCodeRequest,
+} from "../functions/auth.service";
 
 export const useAdminLogin = () => {
   const queryClient = useQueryClient();
@@ -44,6 +50,42 @@ export const useDoctorLogin = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["doctor_profile"] });
+    },
+  });
+};
+
+export const useDoctorRegister = () => {
+  return useMutation({
+    mutationFn: async (payload: DoctorRegRequest) => {
+      const res = await doctorRegister(payload);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to register doctor");
+      }
+      return res;
+    },
+  });
+};
+
+export const useSendVerificationCode = () => {
+  return useMutation({
+    mutationFn: async (payload: SendCodeRequest) => {
+      const res = await sendVerificationCode(payload);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to send verification code");
+      }
+      return res;
+    },
+  });
+};
+
+export const useVerifyVerificationCode = () => {
+  return useMutation({
+    mutationFn: async (payload: VerifyCodeRequest) => {
+      const res = await verifyVerificationCode(payload);
+      if (!res.success || !res.data?.verified) {
+        throw new Error(res.message || "Invalid or expired verification code");
+      }
+      return res;
     },
   });
 };

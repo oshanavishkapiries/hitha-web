@@ -59,6 +59,13 @@ export default function DoctorDashboard() {
     }
   }, [realSummary]);
 
+  // Safety net: if the doctor lands here directly (e.g. bookmark/refresh) with an incomplete profile, send them to onboarding
+  useEffect(() => {
+    if (realProfile && realProfile.isProfileComplete === false) {
+      navigateTo('/doctor/complete-profile');
+    }
+  }, [realProfile]);
+
   // Toggle active accepting status
   const handleToggleActive = async () => {
     const nextState = !isActive;

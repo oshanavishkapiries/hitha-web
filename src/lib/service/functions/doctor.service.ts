@@ -34,6 +34,13 @@ export interface DoctorForgotPasswordRequest {
   newPassword: string;
 }
 
+export interface DoctorProfileCompletionRequest {
+  professionalBio: string;
+  gender: string;
+  languages: string[];
+  qualifications: string[];
+}
+
 export interface DoctorProfileUpdateRequest {
   firstName?: string;
   lastName?: string;
@@ -71,8 +78,8 @@ export const doctorLogin = async (payload: DoctorLoginRequest): Promise<ApiRespo
   return response.data;
 };
 
-export const doctorRegister = async (payload: DoctorRegRequest): Promise<ApiResponse> => {
-  const response = await axiosInstance.post<ApiResponse>(ENDPOINTS.doctor.register, payload);
+export const doctorRegister = async (payload: DoctorRegRequest): Promise<ApiResponse<string>> => {
+  const response = await axiosInstance.post<ApiResponse<string>>(ENDPOINTS.doctor.register, payload);
   return response.data;
 };
 
@@ -96,7 +103,7 @@ export const updateDoctorProfile = async (payload: DoctorProfileUpdateRequest): 
   return response.data;
 };
 
-export const completeDoctorProfileOnboarding = async (payload: any): Promise<ApiResponse<any>> => {
+export const completeDoctorProfileOnboarding = async (payload: DoctorProfileCompletionRequest): Promise<ApiResponse<any>> => {
   const response = await axiosInstance.post<ApiResponse<any>>(ENDPOINTS.doctors.completeProfile, payload);
   return response.data;
 };

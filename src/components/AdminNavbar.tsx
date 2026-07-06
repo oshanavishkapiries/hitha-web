@@ -26,14 +26,11 @@ export default function AdminNavbar({ isRealDocsLoading = false, onLogout }: Adm
   return (
     <nav className="bg-[#0B1E17] border-b border-[#1A3429] sticky top-0 z-40 text-white shadow-resting" id="admin-navbar">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
+        <div className={`flex h-16 items-center ${isLogin ? 'justify-center' : 'justify-between'}`}>
           
-          {/* Logo on the left (position start) */}
+          {/* Logo */}
           <div className="flex items-center">
             <Logo theme="light" id="admin-nav-logo-btn" />
-            <span className="ml-3 hidden sm:inline-block px-2.5 py-0.5 bg-mint/10 text-mint border border-mint/20 rounded-md text-[10px] uppercase font-bold tracking-wider">
-              Admin Portal
-            </span>
           </div>
 
           {/* Search and Profile on the right (position end) */}
