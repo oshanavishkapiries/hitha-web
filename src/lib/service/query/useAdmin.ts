@@ -13,7 +13,9 @@ export const useDoctorApplications = () => {
   return useQuery({
     queryKey: ["doctor_applications"],
     queryFn: async () => {
-      const res = await getDoctorApplications();
+      // The dashboard filters/paginates this list client-side, so fetch the whole
+      // directory in one page instead of relying on the backend's default size=10.
+      const res = await getDoctorApplications({ size: 500 });
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch doctor applications");
       }
