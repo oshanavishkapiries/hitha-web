@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Shield, RefreshCw, LogOut, Terminal, Users, Search } from 'lucide-react';
 import { navigateTo } from '../utils/navigation';
 import Logo from './Logo';
+import NotificationBell from './NotificationBell';
 
 interface AdminNavbarProps {
   isRealDocsLoading?: boolean;
@@ -53,6 +54,8 @@ export default function AdminNavbar({ isRealDocsLoading = false, onLogout }: Adm
               >
                 <Search className="w-4 h-4 text-mint" />
               </button>
+
+              <NotificationBell />
 
               {/* Profile Element */}
               <div className="flex items-center space-x-2.5 pl-2 border-l border-[#1A3429]" id="admin-nav-profile">

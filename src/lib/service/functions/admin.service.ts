@@ -89,8 +89,15 @@ export interface DoctorProfileDetail {
   approvedCustomPriceLkr?: number;
 }
 
-export const getDoctorApplications = async (): Promise<ApiResponse<DoctorApplicant[]>> => {
-  const response = await axiosInstance.get<ApiResponse<DoctorApplicant[]>>(ENDPOINTS.admin.doctors);
+export interface GetDoctorApplicationsParams {
+  status?: "PENDING_APPROVAL" | "ACTIVE" | "SUSPENDED" | "PAUSED" | "REJECTED";
+  search?: string;
+  page?: number;
+  size?: number;
+}
+
+export const getDoctorApplications = async (params?: GetDoctorApplicationsParams): Promise<ApiResponse<DoctorApplicant[]>> => {
+  const response = await axiosInstance.get<ApiResponse<DoctorApplicant[]>>(ENDPOINTS.admin.doctors, { params });
   return response.data;
 };
 

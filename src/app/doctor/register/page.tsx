@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import AppShell from '../../../components/AppShell';
 import { navigateTo } from '../../../utils/navigation';
-import { Lock, Mail, Phone, User, ShieldAlert, ArrowLeft, Stethoscope, BadgeCheck, Paperclip, X } from 'lucide-react';
+import { Lock, Mail, Phone, User, ShieldAlert, ArrowLeft, Stethoscope, BadgeCheck, Paperclip, X, ChevronDown } from 'lucide-react';
 import { useDoctorRegister } from '../../../lib/service/query/useAuth';
 import { useUploadFile } from '../../../lib/service/query/useUpload';
 import { DoctorRegRequest } from '../../../lib/service/functions/doctor.service';
@@ -28,6 +28,7 @@ export default function DoctorRegisterPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [category, setCategory] = useState<DoctorRegRequest['category'] | ''>('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [slmcLicenseNumber, setSlmcLicenseNumber] = useState('');
   const [certificationFiles, setCertificationFiles] = useState<File[]>([]);
   const [error, setError] = useState('');
@@ -217,24 +218,52 @@ export default function DoctorRegisterPage() {
 
             <div>
               <label className="block text-xs font-semibold text-ink-soft mb-1.5">Professional Category</label>
-              <select
-                required
-                value={category}
-                onChange={(e) => {
-                  const nextCategory = e.target.value as DoctorRegRequest['category'];
-                  setCategory(nextCategory);
-                  if (nextCategory !== 'MEDICAL_OFFICER_PSYCHIATRY_DIPLOMA' && nextCategory !== 'CONSULTANT_PSYCHIATRIST') {
-                    setSlmcLicenseNumber('');
-                  }
-                }}
-                className="w-full bg-cream border border-hairline focus:border-forest/50 focus:bg-white rounded-xl px-4 py-3 text-sm text-ink outline-none transition-all cursor-pointer"
-                id="doctor-register-category"
-              >
-                <option value="" disabled>Select your category</option>
-                {CATEGORY_OPTIONS.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setIsDropdownOpen(prev => !prev)}
+                  className="w-full bg-cream border border-hairline focus:border-forest/50 focus:bg-white rounded-xl px-4 py-3 text-sm text-ink flex justify-between items-center cursor-pointer transition-all outline-none"
+                  id="doctor-register-category-btn"
+                >
+                  <span className={category ? 'text-ink font-semibold' : 'text-ink-soft/40'}>
+                    {category ? CATEGORY_OPTIONS.find(opt => opt.value === category)?.label : 'Select your category'}
+                  </span>
+                  <ChevronDown className={`w-4 h-4 text-ink-soft transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isDropdownOpen && (
+                  <>
+                    <div className="fixed inset-0 z-10" onClick={() => setIsDropdownOpen(false)} />
+                    <ul className="absolute z-20 w-full mt-1.5 bg-white border border-hairline rounded-xl shadow-elevated max-h-60 overflow-y-auto outline-none py-1.5 animate-fade-in">
+                      {CATEGORY_OPTIONS.map(opt => {
+                        const isSelected = opt.value === category;
+                        return (
+                          <li key={opt.value}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCategory(opt.value);
+                                setIsDropdownOpen(false);
+                                if (opt.value !== 'MEDICAL_OFFICER_PSYCHIATRY_DIPLOMA' && opt.value !== 'CONSULTANT_PSYCHIATRIST') {
+                                  setSlmcLicenseNumber('');
+                                }
+                              }}
+                              className={`w-full px-4 py-2.5 text-left text-xs sm:text-sm transition-colors duration-150 flex items-center justify-between cursor-pointer ${
+                                isSelected 
+                                  ? 'bg-sprout/20 text-forest font-bold' 
+                                  : 'text-ink hover:bg-cream/40 hover:text-forest'
+                              }`}
+                            >
+                              <span>{opt.label}</span>
+                              {isSelected && <BadgeCheck className="w-4 h-4 text-forest" />}
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </>
+                )}
+              </div>
             </div>
 
             {requiresSlmc && (
