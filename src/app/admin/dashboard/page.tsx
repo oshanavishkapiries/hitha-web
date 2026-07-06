@@ -38,6 +38,7 @@ import {
   useChangeDoctorStatus,
   useDoctorDetails,
 } from '../../../lib/service/query/useAdmin';
+import { useAlert } from '../../../context/AlertContext';
 
 // Mock doctors awaiting SLMC verification as fallback/demo
 const initialPendingDocs = [
@@ -54,6 +55,7 @@ const initialEscrowPayments = [
 ];
 
 export default function AdminDashboard() {
+  const { showAlert } = useAlert();
   const [currentTab, setCurrentTab] = useState<'overview' | 'doctors' | 'escrow' | 'config'>('overview');
   const [escrows, setEscrows] = useState(initialEscrowPayments);
   const [searchTerm, setSearchTerm] = useState('');
@@ -88,27 +90,27 @@ export default function AdminDashboard() {
   const handleApproveDoc = async (id: string) => {
     try {
       await approveMutation.mutateAsync(id);
-      alert('Successfully approved doctor profile on secure server.');
+      showAlert('Successfully approved doctor profile on secure server.', 'success');
       refetchRealDocs();
     } catch (err: any) {
-      alert(`API Error: ${err.message || 'Failed to approve doctor status.'}`);
+      showAlert(`API Error: ${err.message || 'Failed to approve doctor status.'}`, 'error');
     }
   };
 
   // Submit rejection with reason
   const submitRejectDoc = async (id: string) => {
     if (!actionReason.trim()) {
-      alert('Rejection reason is required.');
+      showAlert('Rejection reason is required.', 'warning');
       return;
     }
     try {
       await rejectMutation.mutateAsync({ id, reason: actionReason });
-      alert('Successfully rejected doctor profile.');
+      showAlert('Successfully rejected doctor profile.', 'success');
       setActiveActionDocId(null);
       setActionReason('');
       refetchRealDocs();
     } catch (err: any) {
-      alert(`API Error: ${err.message || 'Failed to reject doctor profile.'}`);
+      showAlert(`API Error: ${err.message || 'Failed to reject doctor profile.'}`, 'error');
     }
   };
 
@@ -120,12 +122,12 @@ export default function AdminDashboard() {
         status: 'SUSPENDED', 
         reason: actionReason || 'Administrative suspension' 
       });
-      alert('Doctor suspended successfully.');
+      showAlert('Doctor suspended successfully.', 'success');
       setActiveActionDocId(null);
       setActionReason('');
       refetchRealDocs();
     } catch (err: any) {
-      alert(`API Error: ${err.message || 'Failed to suspend doctor.'}`);
+      showAlert(`API Error: ${err.message || 'Failed to suspend doctor.'}`, 'error');
     }
   };
 
@@ -137,10 +139,10 @@ export default function AdminDashboard() {
         status: 'ACTIVE', 
         reason: 'Re-activated by administrator' 
       });
-      alert('Doctor activated/unsuspended successfully.');
+      showAlert('Doctor activated/unsuspended successfully.', 'success');
       refetchRealDocs();
     } catch (err: any) {
-      alert(`API Error: ${err.message || 'Failed to activate doctor.'}`);
+      showAlert(`API Error: ${err.message || 'Failed to activate doctor.'}`, 'error');
     }
   };
 
@@ -958,7 +960,7 @@ export default function AdminDashboard() {
 
               <button 
                 onClick={() => {
-                  alert("System configurations saved successfully!");
+                  showAlert("System configurations saved successfully!", "success");
                   setCurrentTab('overview');
                 }}
                 className="bg-forest text-white hover:bg-forest/95 text-xs font-bold px-6 py-3 rounded-xl transition-all shadow-resting cursor-pointer"
