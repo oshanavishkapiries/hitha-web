@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppShell from '../../../components/AppShell';
+import Logo from '../../../components/Logo';
 import { navigateTo } from '../../../utils/navigation';
 import { 
   Users, 
@@ -17,14 +18,22 @@ import {
   LogOut, 
   Check, 
   X,
-  FileSpreadsheet
+  FileSpreadsheet,
+  RefreshCw,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
+import {
+  useDoctorApplications,
+  useApproveDoctor,
+  useRejectDoctor,
+} from '../../../lib/service/query/useAdmin';
 
-// Mock doctors awaiting SLMC verification
+// Mock doctors awaiting SLMC verification as fallback/demo
 const initialPendingDocs = [
-  { id: 1, name: "Dr. Sanduni Alwis", slmc: "SLMC-9321", spec: "Clinical Psychologist", regDate: "2026-07-01", status: "Pending Verification" },
-  { id: 2, name: "Dr. Thilina Perera", slmc: "SLMC-8442", spec: "Psychiatrist & Therapist", regDate: "2026-07-03", status: "Pending Verification" },
-  { id: 3, name: "Dr. Nimal Fernando", slmc: "SLMC-1205", spec: "Child Behavioral Counselor", regDate: "2026-07-05", status: "Pending Verification" }
+  { id: "1", name: "Dr. Sanduni Alwis", slmc: "SLMC-9321", spec: "Clinical Psychologist", regDate: "2026-07-01", status: "Pending Verification" },
+  { id: "2", name: "Dr. Thilina Perera", slmc: "SLMC-8442", spec: "Psychiatrist & Therapist", regDate: "2026-07-03", status: "Pending Verification" },
+  { id: "3", name: "Dr. Nimal Fernando", slmc: "SLMC-1205", spec: "Child Behavioral Counselor", regDate: "2026-07-05", status: "Pending Verification" }
 ];
 
 // Mock escrow payments
@@ -36,18 +45,28 @@ const initialEscrowPayments = [
 
 export default function AdminDashboard() {
   const [currentTab, setCurrentTab] = useState<'overview' | 'verifications' | 'escrow' | 'config'>('overview');
-  const [pendingDocs, setPendingDocs] = useState(initialPendingDocs);
   const [escrows, setEscrows] = useState(initialEscrowPayments);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
 
-  // Handle doc verification
-  const handleVerifyDoc = (id: number, approved: boolean) => {
-    setPendingDocs(prev => prev.map(doc => {
-      if (doc.id === id) {
-        return { ...doc, status: approved ? 'Verified & Active' : 'Rejected' };
+  // React Query service integrations
+  const { data: realDocs, isLoading: isRealDocsLoading, refetch: refetchRealDocs } = useDoctorApplications();
+  const approveMutation = useApproveDoctor();
+  const rejectMutation = useRejectDoctor();
+
+  // Handle doc verification using secure backend server
+  const handleVerifyDoc = async (id: string, approved: boolean) => {
+    try {
+      if (approved) {
+        await approveMutation.mutateAsync(id);
+      } else {
+        await rejectMutation.mutateAsync(id);
       }
-      return doc;
-    }));
+      alert(`Successfully ${approved ? 'approved' : 'rejected'} doctor profile on secure server.`);
+      refetchRealDocs();
+    } catch (err: any) {
+      alert(`API Error: ${err.message || 'Failed to update doctor status on server.'}`);
+    }
   };
 
   // Handle escrow release
@@ -60,118 +79,205 @@ export default function AdminDashboard() {
     }));
   };
 
+  // Prepare active list to show
+  const getActiveDoctorsList = () => {
+    if (realDocs && Array.isArray(realDocs)) {
+      return realDocs.map(doc => ({
+        id: doc.id,
+        name: `${doc.firstName} ${doc.lastName}`,
+        slmc: doc.slmcLicenseNumber || "N/A",
+        spec: doc.category ? doc.category.replace(/_/g, " ") : "Counseling Specialist",
+        regDate: doc.createdAt ? doc.createdAt.split('T')[0] : "Just Now",
+        status: doc.status === "ACTIVE" ? "Verified & Active" : doc.status === "PENDING_VERIFICATION" ? "Pending Verification" : doc.status
+      }));
+    }
+    return [];
+  };
+
+  const activeDoctors = getActiveDoctorsList();
+
   return (
     <AppShell>
-      <div className="bg-[#FAF9F5] min-h-screen flex flex-col lg:flex-row">
+      <div className="bg-[#FAF9F5] min-h-screen flex flex-row overflow-hidden" id="admin-dashboard-container">
         
-        {/* Admin Sidebar */}
-        <aside className="w-full lg:w-64 bg-[#0B1E17] text-white shrink-0 flex flex-col justify-between p-6 border-r border-[#152B22]">
-          <div className="space-y-8">
-            {/* Sidebar Branding */}
-            <div>
-              <div className="flex items-center space-x-2">
-                <span className="font-display font-bold text-xl text-mint">Hitha Control</span>
-                <span className="text-[10px] bg-forest border border-[#2B4E41] text-sprout px-2 py-0.5 rounded-full font-mono">
-                  v1.2
-                </span>
-              </div>
-              <p className="text-[11px] text-sprout/50 mt-1">Hitha System Command Center</p>
-            </div>
+        {/* Left Column (Sidebar) */}
+        <aside className={`bg-[#0B1E17] text-white shrink-0 flex flex-col border-r border-[#152B22] transition-all duration-300 h-screen overflow-y-auto ${
+          isSidebarCollapsed ? 'w-20' : 'w-64'
+        }`} id="admin-sidebar">
+          {/* Logo Element (Top section aligned with right header) */}
+          <div className="h-16 flex items-center px-6 border-b border-[#152B22] shrink-0 justify-between" id="admin-sidebar-logo-container">
+            {!isSidebarCollapsed ? (
+              <Logo theme="light" id="admin-sidebar-logo" className="text-xl" />
+            ) : (
+              <button 
+                onClick={() => navigateTo('/')} 
+                className="font-display font-bold text-xl text-mint mx-auto cursor-pointer focus:outline-none"
+                id="admin-sidebar-logo-collapsed"
+              >
+                H
+              </button>
+            )}
+          </div>
 
+          {/* Sidebar Navigation (Middle section) */}
+          <div className="flex-1 py-6 px-4 space-y-8 overflow-y-auto">
             {/* Nav Menu */}
             <nav className="flex flex-col gap-2">
               <button
                 onClick={() => setCurrentTab('overview')}
-                className={`w-full text-left px-4 py-3 rounded-xl text-xs font-semibold flex items-center space-x-3 transition-colors cursor-pointer ${
+                className={`text-left rounded-xl text-xs font-semibold flex items-center transition-all cursor-pointer ${
+                  isSidebarCollapsed ? 'justify-center p-3 w-12 h-12 mx-auto' : 'px-4 py-3 space-x-3 w-full'
+                } ${
                   currentTab === 'overview' ? 'bg-[#152B22] text-white font-bold border border-[#2B4E41]' : 'text-sprout/70 hover:bg-forest/20'
                 }`}
                 id="admin-tab-overview"
+                title="Overview & Analytics"
               >
-                <TrendingUp className="w-4 h-4 text-mint" />
-                <span>Overview & Analytics</span>
+                <TrendingUp className="w-4 h-4 text-mint shrink-0" />
+                {!isSidebarCollapsed && <span>Overview & Analytics</span>}
               </button>
 
-              <button
-                onClick={() => setCurrentTab('verifications')}
-                className={`w-full text-left px-4 py-3 rounded-xl text-xs font-semibold flex items-center space-x-3 transition-colors cursor-pointer ${
-                  currentTab === 'verifications' ? 'bg-[#152B22] text-white font-bold border border-[#2B4E41]' : 'text-sprout/70 hover:bg-forest/20'
-                }`}
-                id="admin-tab-verifications"
-              >
-                <ShieldCheck className="w-4 h-4 text-mint" />
-                <div className="flex-1 flex justify-between items-center">
-                  <span>SLMC Verifications</span>
-                  {pendingDocs.filter(d => d.status === 'Pending Verification').length > 0 && (
-                    <span className="bg-red-500 text-white text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full">
-                      {pendingDocs.filter(d => d.status === 'Pending Verification').length}
-                    </span>
+              <div className="relative">
+                <button
+                  onClick={() => setCurrentTab('verifications')}
+                  className={`text-left rounded-xl text-xs font-semibold flex items-center transition-all cursor-pointer ${
+                    isSidebarCollapsed ? 'justify-center p-3 w-12 h-12 mx-auto' : 'px-4 py-3 space-x-3 w-full'
+                  } ${
+                    currentTab === 'verifications' ? 'bg-[#152B22] text-white font-bold border border-[#2B4E41]' : 'text-sprout/70 hover:bg-forest/20'
+                  }`}
+                  id="admin-tab-verifications"
+                  title="SLMC Verifications"
+                >
+                  <ShieldCheck className="w-4 h-4 text-mint shrink-0" />
+                  {!isSidebarCollapsed && (
+                    <div className="flex-1 flex justify-between items-center min-w-0">
+                      <span className="truncate">SLMC Verifications</span>
+                      {activeDoctors.filter(d => d.status === 'Pending Verification').length > 0 && (
+                        <span className="bg-red-500 text-white text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full shrink-0 ml-1">
+                          {activeDoctors.filter(d => d.status === 'Pending Verification').length}
+                        </span>
+                      )}
+                    </div>
                   )}
-                </div>
-              </button>
+                </button>
+                {isSidebarCollapsed && activeDoctors.filter(d => d.status === 'Pending Verification').length > 0 && (
+                  <span className="absolute top-1 right-2 flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                  </span>
+                )}
+              </div>
 
               <button
                 onClick={() => setCurrentTab('escrow')}
-                className={`w-full text-left px-4 py-3 rounded-xl text-xs font-semibold flex items-center space-x-3 transition-colors cursor-pointer ${
+                className={`text-left rounded-xl text-xs font-semibold flex items-center transition-all cursor-pointer ${
+                  isSidebarCollapsed ? 'justify-center p-3 w-12 h-12 mx-auto' : 'px-4 py-3 space-x-3 w-full'
+                } ${
                   currentTab === 'escrow' ? 'bg-[#152B22] text-white font-bold border border-[#2B4E41]' : 'text-sprout/70 hover:bg-forest/20'
                 }`}
                 id="admin-tab-escrow"
+                title="Escrow Payments"
               >
-                <CreditCard className="w-4 h-4 text-mint" />
-                <span>Escrow Payments</span>
+                <CreditCard className="w-4 h-4 text-mint shrink-0" />
+                {!isSidebarCollapsed && <span>Escrow Payments</span>}
               </button>
 
               <button
                 onClick={() => setCurrentTab('config')}
-                className={`w-full text-left px-4 py-3 rounded-xl text-xs font-semibold flex items-center space-x-3 transition-colors cursor-pointer ${
+                className={`text-left rounded-xl text-xs font-semibold flex items-center transition-all cursor-pointer ${
+                  isSidebarCollapsed ? 'justify-center p-3 w-12 h-12 mx-auto' : 'px-4 py-3 space-x-3 w-full'
+                } ${
                   currentTab === 'config' ? 'bg-[#152B22] text-white font-bold border border-[#2B4E41]' : 'text-sprout/70 hover:bg-forest/20'
                 }`}
                 id="admin-tab-config"
+                title="System Configuration"
               >
-                <Settings className="w-4 h-4 text-mint" />
-                <span>System Configuration</span>
+                <Settings className="w-4 h-4 text-mint shrink-0" />
+                {!isSidebarCollapsed && <span>System Configuration</span>}
               </button>
             </nav>
           </div>
 
           {/* Sidebar Footer */}
-          <div className="pt-6 border-t border-[#152B22] space-y-3.5">
-            <div className="flex items-center space-x-2.5">
-              <div className="w-8 h-8 rounded-full bg-mint/10 flex items-center justify-center font-bold text-mint text-xs">
-                AD
-              </div>
-              <div>
-                <h5 className="text-xs font-bold">Admin Root</h5>
-                <span className="text-[10px] text-sprout/50 block">admin@hitha.lk</span>
-              </div>
-            </div>
+          <div className="p-4 border-t border-[#152B22]">
             <button
               onClick={() => navigateTo('/admin/login')}
-              className="w-full bg-[#152B22] hover:bg-[#1C3A2E] text-red-300 text-xs font-bold py-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-center space-x-1.5 border border-[#2B4E41]"
+              className={`bg-[#152B22] hover:bg-[#1C3A2E] text-red-300 text-xs font-bold transition-all cursor-pointer flex items-center border border-[#2B4E41] ${
+                isSidebarCollapsed ? 'justify-center p-3 w-12 h-12 mx-auto rounded-full' : 'py-2.5 px-4 rounded-xl justify-center space-x-1.5 w-full'
+              }`}
               id="admin-sidebar-logout"
+              title="Sign Out"
             >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Sign Out</span>
+              <LogOut className="w-3.5 h-3.5 shrink-0" />
+              {!isSidebarCollapsed && <span>Sign Out</span>}
             </button>
           </div>
         </aside>
 
-        {/* Admin Dashboard Core Display Panel */}
-        <main className="flex-1 p-6 sm:p-8 space-y-8 overflow-y-auto">
+        {/* Right Column (Header + Dashboard Content) */}
+        <div className="flex-1 flex flex-col h-screen overflow-hidden" id="admin-main-column">
           
-          {/* Top Info Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-hairline pb-4">
-            <div>
-              <h1 className="text-2xl font-display font-bold text-forest">Hitha Administration Command Center</h1>
-              <p className="text-xs text-ink-soft mt-1">Comprehensive system analytics, doctor verifications, and financial audit registers.</p>
+          {/* Top Header of Right Column */}
+          <header className="h-16 bg-white border-b border-[#EBE8DF] flex items-center justify-between px-6 shrink-0" id="admin-main-header">
+            {/* Header Left (Collapse button '<' / '>') */}
+            <div className="flex items-center">
+              <button
+                onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                className="p-1.5 border border-[#EBE8DF] rounded-lg bg-white text-[#0B1E17] hover:bg-[#FAF9F5] hover:text-[#0D241C] transition-all cursor-pointer focus:outline-none flex items-center justify-center shadow-sm"
+                title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+                id="admin-sidebar-toggle-btn"
+              >
+                {isSidebarCollapsed ? (
+                  <ChevronRight className="w-4 h-4 text-[#0B1E17]" />
+                ) : (
+                  <ChevronLeft className="w-4 h-4 text-[#0B1E17]" />
+                )}
+              </button>
             </div>
-            <span className="text-xs font-mono font-bold bg-forest text-white px-3.5 py-1.5 rounded-full flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-mint animate-pulse" />
-              System Status: Fully Operational
-            </span>
-          </div>
 
-          {/* 1. OVERVIEW & ANALYTICS TAB */}
-          {currentTab === 'overview' && (
+            {/* Header Right (search, profile) */}
+            <div className="flex items-center space-x-6">
+              {/* Search Element */}
+              <div className="relative max-w-xs">
+                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#0B1E17]/40">
+                  <Search className="w-3.5 h-3.5" />
+                </span>
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="bg-[#FAF9F5] border border-[#EBE8DF] text-xs text-[#0B1E17] placeholder:text-[#0B1E17]/40 rounded-xl pl-9 pr-4 py-1.5 w-40 sm:w-48 focus:outline-none focus:border-mint/60 focus:bg-white transition-all shadow-inner"
+                  id="dashboard-search-input"
+                />
+              </div>
+
+              {/* Profile Element */}
+              <div className="flex items-center space-x-2.5 pl-4 border-l border-[#EBE8DF]" id="admin-header-profile">
+                <div className="w-8 h-8 rounded-full bg-mint/10 border border-mint/30 flex items-center justify-center font-bold text-mint text-xs">
+                  AD
+                </div>
+                <div className="hidden sm:block text-left">
+                  <h5 className="text-[11px] font-bold text-[#0B1E17] leading-tight">Admin Root</h5>
+                  <span className="text-[9px] text-[#0B1E17]/50 block leading-none">admin@hitha.lk</span>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          {/* Admin Dashboard Core Display Panel */}
+          <main className="flex-1 p-6 sm:p-8 space-y-8 overflow-y-auto bg-[#FAF9F5]" id="admin-main-content">
+            
+            {/* Top Info Header */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-hairline pb-4" id="admin-title-row">
+              <div>
+                <h1 className="text-2xl font-display font-bold text-forest">Administration Dashboard</h1>
+                <p className="text-xs text-ink-soft mt-1">Manage doctor verifications, escrow releases, and platform statistics.</p>
+              </div>
+            </div>
+
+            {/* 1. OVERVIEW & ANALYTICS TAB */}
+            {currentTab === 'overview' && (
             <div className="space-y-8">
               
               {/* KPIs Grid */}
@@ -180,7 +286,7 @@ export default function AdminDashboard() {
                 <div className="bg-white p-5 rounded-2xl border border-hairline shadow-resting">
                   <span className="text-[10px] uppercase font-bold text-ink-soft block tracking-wider mb-1">Registered Doctors</span>
                   <div className="flex items-baseline space-x-2">
-                    <span className="text-2xl font-display font-bold text-forest">42</span>
+                    <span className="text-2xl font-display font-bold text-forest">{realDocs ? realDocs.length : 0}</span>
                     <span className="text-xs text-mint font-bold">+3 new this week</span>
                   </div>
                   <p className="text-[11px] text-ink-soft mt-2">Verified SLMC clinical directory.</p>
@@ -208,7 +314,7 @@ export default function AdminDashboard() {
                   <span className="text-[10px] uppercase font-bold text-ink-soft block tracking-wider mb-1">Pending Approvals</span>
                   <div className="flex items-baseline space-x-2">
                     <span className="text-2xl font-display font-bold text-red-600">
-                      {pendingDocs.filter(d => d.status === 'Pending Verification').length}
+                      {activeDoctors.filter(d => d.status === 'Pending Verification').length}
                     </span>
                     <span className="text-xs text-red-500 font-bold">Urgent Verification</span>
                   </div>
@@ -330,7 +436,7 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {pendingDocs
+                    {activeDoctors
                       .filter(d => d.name.toLowerCase().includes(searchTerm.toLowerCase()) || d.slmc.toLowerCase().includes(searchTerm.toLowerCase()))
                       .map(doc => (
                         <tr key={doc.id} className="border-b border-hairline hover:bg-cream/20 transition-colors">
@@ -354,14 +460,16 @@ export default function AdminDashboard() {
                               <div className="flex justify-end gap-2">
                                 <button
                                   onClick={() => handleVerifyDoc(doc.id, false)}
-                                  className="p-1.5 bg-red-100 hover:bg-red-200 text-red-800 rounded-lg cursor-pointer transition-colors"
+                                  disabled={approveMutation.isPending || rejectMutation.isPending}
+                                  className="p-1.5 bg-red-100 hover:bg-red-200 text-red-800 rounded-lg cursor-pointer transition-colors disabled:opacity-50"
                                   title="Reject Registration"
                                 >
                                   <X className="w-4 h-4" />
                                 </button>
                                 <button
                                   onClick={() => handleVerifyDoc(doc.id, true)}
-                                  className="p-1.5 bg-mint/20 hover:bg-mint/40 text-forest rounded-lg cursor-pointer transition-colors"
+                                  disabled={approveMutation.isPending || rejectMutation.isPending}
+                                  className="p-1.5 bg-mint/20 hover:bg-mint/40 text-forest rounded-lg cursor-pointer transition-colors disabled:opacity-50"
                                   title="Verify & Publish Profile"
                                 >
                                   <Check className="w-4 h-4" />
@@ -530,6 +638,7 @@ export default function AdminDashboard() {
 
         </main>
       </div>
-    </AppShell>
+    </div>
+  </AppShell>
   );
 }

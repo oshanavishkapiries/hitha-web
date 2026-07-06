@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import '../index.css';
+import QueryProvider from '../components/providers/query-provider';
 
 export const metadata: Metadata = {
   title: "Hitha (හිත) - Privacy-First Mental Health Support Sri Lanka",
@@ -15,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        {children}
+        <QueryProvider>
+          {children}
+        </QueryProvider>
       </body>
     </html>
   );

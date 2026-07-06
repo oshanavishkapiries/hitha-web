@@ -1,5 +1,6 @@
 import { BookOpen, CalendarRange } from 'lucide-react';
 import { navigateTo } from '../utils/navigation';
+import Logo from './Logo';
 
 interface NavbarProps {
   onOpenAppointments: () => void;
@@ -12,14 +13,8 @@ export default function Navbar({ onOpenAppointments, onOpenBlogs }: NavbarProps)
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           
-          {/* Logo & Brand (Simplified to text-only Hitha as requested) */}
-          <button
-            onClick={() => navigateTo('/')}
-            className="font-display font-bold text-2xl text-forest hover:text-moss tracking-tight cursor-pointer focus:outline-none transition-colors"
-            id="nav-logo-btn"
-          >
-            Hitha
-          </button>
+          {/* Logo & Brand */}
+          <Logo theme="dark" id="nav-logo-btn" />
 
           {/* Navigation Links and Buttons */}
           <div className="flex items-center space-x-6">

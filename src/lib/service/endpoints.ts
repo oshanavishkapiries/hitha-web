@@ -1,0 +1,34 @@
+export const ENDPOINTS = {
+  auth: {
+    refresh: "/auth/refresh",
+    logout: "/auth/logout",
+    forgotPassword: "/auth/forgot-password",
+    resetPassword: "/auth/reset-password",
+  },
+  admin: {
+    login: "/admin/login",
+    register: "/admin/register",
+    forgotPassword: "/admin/forgot-password",
+    sendCode: "/admin/send-code",
+    verifyCode: "/admin/verify-code",
+    doctors: "/admin/doctors",
+    approveDoctor: (id: string) => `/admin/doctors/${id}/approve`,
+    rejectDoctor: (id: string) => `/admin/doctors/${id}/reject`,
+    changeDoctorStatus: (id: string) => `/admin/doctors/${id}/status`,
+  },
+  doctor: {
+    login: "/doctor/login",
+    register: "/doctor/register",
+    forgotPassword: "/doctor/forgot-password",
+  },
+  doctors: {
+    me: "/doctors/me",
+    meProfile: "/doctors/me/profile",
+    completeProfile: "/doctors/me/complete-profile",
+    updateStatus: "/doctors/status",
+    blockedDates: "/doctors/blocked-dates",
+    removeBlockedDate: (id: string) => `/doctors/blocked-dates/${id}`,
+    priceRequests: "/doctors/price-requests",
+    slots: "/doctors/slots",
+  }
+};

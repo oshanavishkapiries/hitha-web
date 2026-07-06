@@ -3,29 +3,38 @@
 import React, { useState } from 'react';
 import AppShell from '../../../components/AppShell';
 import { navigateTo } from '../../../utils/navigation';
-import { Lock, Mail, ShieldAlert, ArrowLeft, Stethoscope } from 'lucide-react';
+import { Lock, Mail, ShieldAlert, ArrowLeft, Stethoscope, Play } from 'lucide-react';
+import { useDoctorLogin } from '../../../lib/service/query/useAuth';
 
 export default function DoctorLogin() {
-  const [email, setEmail] = useState('doctor@hitha.lk');
-  const [password, setPassword] = useState('doctor123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  
+  const loginMutation = useDoctorLogin();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
 
-    // Simulate authentication
-    setTimeout(() => {
-      if (email.trim() === 'doctor@hitha.lk' && password === 'doctor123') {
-        setIsLoading(false);
+    try {
+      // 1. Attempt authenticating using the real backend API service
+      const response = await loginMutation.mutateAsync({
+        identifier: email,
+        password: password
+      });
+
+      if (response.success) {
         navigateTo('/doctor/dashboard');
       } else {
-        setIsLoading(false);
-        setError('Invalid SLMC-registered email or password combination.');
+        setError(response.message || 'Invalid SLMC-registered email or password combination.');
       }
-    }, 1000);
+    } catch (err: any) {
+      console.error("Real login failed:", err);
+      setError(
+        err?.message || 'Real backend API connection failed or is currently unreachable. Please verify your internet connection or server status.'
+      );
+    }
   };
 
   return (
@@ -57,9 +66,11 @@ export default function DoctorLogin() {
 
           <form className="mt-8 space-y-6" onSubmit={handleSubmit} id="doctor-login-form">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs flex items-center space-x-2">
-                <ShieldAlert className="w-4 h-4 shrink-0" />
-                <span>{error}</span>
+              <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs flex flex-col space-y-2">
+                <div className="flex items-center space-x-2">
+                  <ShieldAlert className="w-4 h-4 shrink-0 text-red-600" />
+                  <span>{error}</span>
+                </div>
               </div>
             )}
 
@@ -115,44 +126,23 @@ export default function DoctorLogin() {
 
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={loginMutation.isPending}
               className="w-full bg-forest hover:bg-forest/90 text-white font-sans font-bold py-3.5 px-4 rounded-xl text-sm transition-all shadow-resting hover:shadow-elevated active:scale-[0.98] flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
               id="doctor-signin-submit"
             >
-              {isLoading ? (
+              {loginMutation.isPending ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Entering Sanctuary...</span>
+                  <span>Verifying on Secure Server...</span>
                 </>
               ) : (
                 <span>Sign In to Portal</span>
               )}
             </button>
-
-            {/* Quick Demo Assist */}
-            <div className="bg-[#FAF9F5] border border-hairline p-3 rounded-2xl">
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-[10px] font-bold text-forest uppercase tracking-wider">Demo Quick Access</span>
-                <span className="text-[10px] text-ink-soft bg-mint/20 px-1.5 py-0.5 rounded-full font-medium">SLMC verified mockup</span>
-              </div>
-              <p className="text-[11px] text-ink-soft mb-2">
-                Click below to instantly pre-fill credentials for the Doctor Dashboard demonstration.
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  setEmail('doctor@hitha.lk');
-                  setPassword('doctor123');
-                }}
-                className="w-full bg-white hover:bg-cream border border-hairline text-forest text-xs font-semibold py-1.5 rounded-lg transition-all"
-                id="doctor-demo-fill-btn"
-              >
-                Use Demo Credentials
-              </button>
-            </div>
           </form>
         </div>
       </div>
     </AppShell>
   );
 }
+

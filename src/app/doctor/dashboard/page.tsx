@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppShell from '../../../components/AppShell';
 import { navigateTo } from '../../../utils/navigation';
 import { 
@@ -16,8 +16,14 @@ import {
   Video, 
   Check, 
   Send,
-  AlertCircle
+  AlertCircle,
+  RefreshCw
 } from 'lucide-react';
+import {
+  useDoctorSummary,
+  useDoctorProfile,
+  useUpdateDoctorStatus,
+} from '../../../lib/service/query/useDoctor';
 
 // Mock Patient Chats
 const initialChats = [
@@ -40,6 +46,29 @@ export default function DoctorDashboard() {
       { sender: 'patient', text: "Should I continue my therapy sessions weekly?", time: "Yesterday" }
     ]
   });
+
+  // React Query server integrations
+  const { data: realSummary, isLoading: isSummaryLoading } = useDoctorSummary();
+  const { data: realProfile, isLoading: isProfileLoading } = useDoctorProfile();
+  const updateStatusMutation = useUpdateDoctorStatus();
+
+  // Automatically enable server database mode if doctor summary data is successfully retrieved
+  useEffect(() => {
+    if (realSummary) {
+      setIsActive(realSummary.status === "ONLINE");
+    }
+  }, [realSummary]);
+
+  // Toggle active accepting status
+  const handleToggleActive = async () => {
+    const nextState = !isActive;
+    setIsActive(nextState);
+    try {
+      await updateStatusMutation.mutateAsync(nextState ? "ONLINE" : "OFFLINE");
+    } catch (err: any) {
+      alert(`API Error: ${err.message || 'Failed to update status on server.'}`);
+    }
+  };
 
   // Prescription State
   const [patientName, setPatientName] = useState('Thilina Perera');
@@ -96,6 +125,23 @@ export default function DoctorDashboard() {
     setActiveTab('overview');
   };
 
+  // Extract displaying metadata
+  const docName = realSummary
+    ? `Dr. ${realSummary.firstName} ${realSummary.lastName}`
+    : "Dr. Kaveesh Alwis";
+
+  const docSlmc = realSummary
+    ? realSummary.slmcLicenseNumber || "9321"
+    : "9321";
+
+  const docCategory = realSummary && realSummary.category
+    ? realSummary.category.replace(/_/g, " ")
+    : "Clinical Psychologist";
+
+  const docFee = realSummary
+    ? `${realSummary.hourlyRate || "3,500"}`
+    : "3,500";
+
   return (
     <AppShell>
       <div className="bg-cream min-h-screen py-8 px-4 sm:px-6 lg:px-8">
@@ -108,14 +154,14 @@ export default function DoctorDashboard() {
             <div className="space-y-2 relative z-10">
               <div className="flex items-center space-x-2">
                 <span className="bg-mint/20 text-mint text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
-                  SLMC No: 9321
+                  SLMC No: {docSlmc}
                 </span>
-                <span className="bg-[#FAF9F5]/10 text-sprout text-xs px-2 py-0.5 rounded-full font-mono">
-                  Verified Consultant
+                <span className="bg-[#FAF9F5]/10 text-sprout text-xs px-2.5 py-1 rounded-full font-mono">
+                  {docCategory}
                 </span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-display font-bold">
-                Ayubowan, Dr. Kaveesh Alwis
+                Ayubowan, {docName}
               </h1>
               <p className="text-xs text-sprout/80 max-w-xl">
                 Trilingual clinical psychologist counseling sanctuary. Thank you for making Sri Lanka's mindsets healthier and anonymous.
@@ -132,8 +178,9 @@ export default function DoctorDashboard() {
                   </span>
                 </div>
                 <button
-                  onClick={() => setIsActive(!isActive)}
-                  className="bg-white hover:bg-cream text-forest text-xs font-bold px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                  onClick={handleToggleActive}
+                  disabled={updateStatusMutation.isPending}
+                  className="bg-white hover:bg-cream text-forest text-xs font-bold px-2.5 py-1 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
                   id="doctor-status-toggle"
                 >
                   Change
@@ -608,7 +655,7 @@ export default function DoctorDashboard() {
 
                     <div className="bg-amber-50 p-3 rounded-xl border border-amber-200 text-amber-800 text-[11px] flex gap-2">
                       <AlertCircle className="w-4 h-4 shrink-0" />
-                      <span>By saving this form, you authorize adding Dr. Kaveesh Alwis's verified SLMC seal and digital signature to the digital prescription document.</span>
+                      <span>By saving this form, you authorize adding {docName}'s verified SLMC seal and digital signature to the digital prescription document.</span>
                     </div>
 
                     <button
@@ -660,11 +707,11 @@ export default function DoctorDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="p-4 bg-[#FAF9F5] border border-hairline rounded-2xl text-center space-y-3">
                     <div className="w-16 h-16 rounded-full bg-mint/30 mx-auto flex items-center justify-center font-display font-bold text-forest text-lg border border-mint">
-                      KA
+                      {docName.split(' ').map(n => n[0]).filter(Boolean).slice(0, 2).join('')}
                     </div>
                     <div>
-                      <h4 className="font-display font-bold text-forest text-sm">Dr. Kaveesh Alwis</h4>
-                      <p className="text-[11px] text-ink-soft">Clinical Psychologist • SLMC-9321</p>
+                      <h4 className="font-display font-bold text-forest text-sm">{docName}</h4>
+                      <p className="text-[11px] text-ink-soft">{docCategory} • SLMC-{docSlmc}</p>
                     </div>
                     <span className="text-[10px] bg-mint/20 text-forest px-2 py-0.5 rounded-full font-bold inline-block">Trilingual (Sinhala, Tamil, English)</span>
                   </div>
@@ -675,7 +722,7 @@ export default function DoctorDashboard() {
                         <label className="block text-xs font-semibold text-ink-soft mb-1">Hourly Consultation Fee (LKR)</label>
                         <input
                           type="text"
-                          defaultValue="3,500"
+                          defaultValue={docFee}
                           className="w-full bg-cream border border-hairline rounded-xl p-2.5 text-xs text-forest outline-none focus:border-forest"
                         />
                       </div>
