@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import AppShell from '../../../components/AppShell';
 import { navigateTo } from '../../../utils/navigation';
-import { Lock, Mail, ShieldAlert, ArrowLeft, Terminal, Play, Eye, EyeOff } from 'lucide-react';
+import { Lock, Mail, ShieldAlert, ShieldCheck, ArrowLeft, Terminal, Play, Eye, EyeOff } from 'lucide-react';
 import { useAdminLogin } from '../../../lib/service/query/useAuth';
 import { getApiErrorMessage } from '../../../utils/errors';
 
