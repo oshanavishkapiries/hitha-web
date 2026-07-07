@@ -55,6 +55,8 @@ export default function DoctorProfilePage() {
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [isDeletingProfile, setIsDeletingProfile] = useState(false);
   const [profileDocuments, setProfileDocuments] = useState<string[]>([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmationText, setDeleteConfirmationText] = useState('');
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const documentInputRef = useRef<HTMLInputElement>(null);
@@ -214,15 +216,14 @@ export default function DoctorProfilePage() {
   };
 
   const handleDeleteAccount = async () => {
-    const confirmation = window.confirm(
-      "Are you absolutely sure you want to deactivate and permanently delete your doctor profile? This action is irreversible."
-    );
-    if (!confirmation) return;
+    if (deleteConfirmationText.trim().toLowerCase() !== 'delete') return;
 
     setIsDeletingProfile(true);
     try {
       await deleteProfileMutation.mutateAsync();
       showAlert("Your profile has been successfully deactivated.", "success");
+      setShowDeleteModal(false);
+      setDeleteConfirmationText('');
       navigateTo('/doctor/login');
     } catch (err: any) {
       showAlert(`Error deactivating profile: ${getApiErrorMessage(err, 'Failed to delete account.')}`, "error");
@@ -386,11 +387,10 @@ export default function DoctorProfilePage() {
                       </p>
                       <button
                         type="button"
-                        disabled={isDeletingProfile}
-                        onClick={handleDeleteAccount}
-                        className="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 rounded-xl transition-colors cursor-pointer disabled:opacity-50"
+                        onClick={() => setShowDeleteModal(true)}
+                        className="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 rounded-xl transition-colors cursor-pointer"
                       >
-                        {isDeletingProfile ? 'Deactivating...' : 'Delete Doctor Profile'}
+                        Delete Doctor Profile
                       </button>
                     </div>
                   </div>
@@ -653,6 +653,58 @@ export default function DoctorProfilePage() {
 
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0B1E17]/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white border border-hairline w-full max-w-md p-6 rounded-3xl shadow-elevated space-y-4 animate-scale-up">
+            <div className="flex items-center gap-3 text-red-600">
+              <div className="p-2.5 bg-red-50 rounded-xl">
+                <AlertCircle className="w-6 h-6 text-red-600" />
+              </div>
+              <h3 className="font-display font-bold text-lg text-forest">Deactivate Doctor Profile</h3>
+            </div>
+            
+            <p className="text-xs text-ink-soft leading-relaxed">
+              This action is permanent and irreversible. Your doctor profile will be deactivated, and your details will be completely removed from the public directories.
+            </p>
+            
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-ink-soft">
+                Type the word <span className="font-bold text-red-600 font-mono">"delete"</span> below to confirm:
+              </label>
+              <input
+                type="text"
+                value={deleteConfirmationText}
+                onChange={(e) => setDeleteConfirmationText(e.target.value)}
+                placeholder="delete"
+                className="w-full bg-cream border border-hairline focus:border-red-500 focus:bg-white rounded-xl px-4 py-3 text-sm text-ink outline-none transition-all font-mono"
+              />
+            </div>
+            
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setDeleteConfirmationText('');
+                }}
+                className="flex-1 bg-cream hover:bg-cream/80 text-forest text-xs font-bold py-3 rounded-xl border border-hairline transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={deleteConfirmationText.trim().toLowerCase() !== 'delete' || isDeletingProfile}
+                onClick={handleDeleteAccount}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-3 rounded-xl transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isDeletingProfile ? 'Deactivating...' : 'Confirm Deactivation'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }
