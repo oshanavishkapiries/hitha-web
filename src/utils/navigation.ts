@@ -9,7 +9,6 @@ export function getQueryParams(): FilterParams {
       gender: '',
       minPrice: undefined,
       maxPrice: undefined,
-      date: '',
       page: 1,
     };
   }
@@ -21,7 +20,6 @@ export function getQueryParams(): FilterParams {
     gender: params.get('gender') || '',
     minPrice: params.get('minPrice') ? Number(params.get('minPrice')) : undefined,
     maxPrice: params.get('maxPrice') ? Number(params.get('maxPrice')) : undefined,
-    date: params.get('date') || '',
     page: params.get('page') ? Number(params.get('page')) : 1,
     size: params.get('size') ? Number(params.get('size')) : 6,
   };

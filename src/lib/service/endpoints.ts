@@ -37,5 +37,9 @@ export const ENDPOINTS = {
   },
   files: {
     upload: "/files/upload",
-  }
+  },
+  patients: {
+    doctors: "/patients/doctors",
+    doctorDetail: (id: string) => `/patients/doctors/${id}`,
+  },
 };

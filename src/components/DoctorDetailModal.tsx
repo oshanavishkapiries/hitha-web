@@ -1,14 +1,28 @@
 import React, { useState } from 'react';
-import { X, Star, Calendar, Clock, Globe, Shield, User, ChevronRight, CheckCircle2 } from 'lucide-react';
-import { Doctor, Slot } from '../types';
+import { X, Star, Clock, Shield, User, ChevronRight, CheckCircle2, Loader2, AlertTriangle } from 'lucide-react';
+import { useDoctorPublicDetail } from '../lib/service/query/useDiscovery';
+import { SlotResponse } from '../lib/service/functions/discovery.service';
 
 interface DoctorDetailModalProps {
-  doctor: Doctor;
+  doctorId: string;
   onClose: () => void;
 }
 
-export default function DoctorDetailModal({ doctor, onClose }: DoctorDetailModalProps) {
-  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
+function formatTimeRange(startTime: string, endTime: string) {
+  const start = new Date(startTime);
+  const end = new Date(endTime);
+  const opts: Intl.DateTimeFormatOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
+  return `${start.toLocaleTimeString('en-US', opts)} - ${end.toLocaleTimeString('en-US', opts)}`;
+}
+
+function slotDurationMinutes(startTime: string, endTime: string) {
+  return Math.round((new Date(endTime).getTime() - new Date(startTime).getTime()) / 60000);
+}
+
+export default function DoctorDetailModal({ doctorId, onClose }: DoctorDetailModalProps) {
+  const { data: doctor, isLoading, isError } = useDoctorPublicDetail(doctorId);
+
+  const [selectedSlot, setSelectedSlot] = useState<SlotResponse | null>(null);
   const [bookingStep, setBookingStep] = useState<'details' | 'form' | 'success'>('details');
   const [nickname, setNickname] = useState('');
   const [contactMethod, setContactMethod] = useState<'video' | 'audio' | 'chat'>('video');
@@ -32,7 +46,7 @@ export default function DoctorDetailModal({ doctor, onClose }: DoctorDetailModal
 
   const handleConfirmBooking = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedSlot) return;
+    if (!selectedSlot || !doctor) return;
     // Generate secure reference token
     const randPart1 = Math.floor(1000 + Math.random() * 9000);
     const randPart2 = Math.floor(1000 + Math.random() * 9000);
@@ -45,11 +59,10 @@ export default function DoctorDetailModal({ doctor, onClose }: DoctorDetailModal
       referenceCode: generatedRef,
       doctorId: doctor.id,
       doctorName: `Dr. ${doctor.firstName} ${doctor.lastName}`,
-      doctorSpecialization: doctor.specialization,
-      doctorPicture: doctor.profilePicture,
-      timeRange: selectedSlot.timeRange,
-      price: selectedSlot.price,
-      duration: selectedSlot.duration,
+      doctorPicture: doctor.profilePicture || '',
+      timeRange: formatTimeRange(selectedSlot.startTime, selectedSlot.endTime),
+      price: selectedSlot.priceLkr,
+      duration: slotDurationMinutes(selectedSlot.startTime, selectedSlot.endTime),
       nickname: nickname,
       contactMethod: contactMethod,
       dateBooked: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
@@ -60,7 +73,7 @@ export default function DoctorDetailModal({ doctor, onClose }: DoctorDetailModal
       const list = existing ? JSON.parse(existing) : [];
       list.push(newAppointment);
       localStorage.setItem('hitha_appointments', JSON.stringify(list));
-      
+
       // Dispatch a custom event to notify components that appointments changed
       window.dispatchEvent(new Event('hitha_appointments_updated'));
     } catch (err) {
@@ -93,6 +106,11 @@ export default function DoctorDetailModal({ doctor, onClose }: DoctorDetailModal
     }
     return <div className="flex items-center space-x-0.5">{stars}</div>;
   };
+
+  const averageRating =
+    doctor && doctor.reviews.length > 0
+      ? doctor.reviews.reduce((sum, r) => sum + r.rating, 0) / doctor.reviews.length
+      : null;
 
   return (
     <div
@@ -127,33 +145,46 @@ export default function DoctorDetailModal({ doctor, onClose }: DoctorDetailModal
 
         {/* Modal Body (Scrollable) */}
         <div className="flex-1 overflow-y-auto p-6 sm:p-8">
-          {bookingStep === 'details' && (
+          {isLoading && (
+            <div className="flex flex-col items-center justify-center py-16 space-y-3 text-ink-soft">
+              <Loader2 className="w-8 h-8 animate-spin text-moss" />
+              <p className="text-xs font-sans">Loading practitioner profile...</p>
+            </div>
+          )}
+
+          {isError && !isLoading && (
+            <div className="flex flex-col items-center justify-center py-16 space-y-3 text-clay text-center">
+              <AlertTriangle className="w-8 h-8" />
+              <p className="text-xs font-sans font-semibold">Unable to load this doctor's profile right now.</p>
+            </div>
+          )}
+
+          {doctor && bookingStep === 'details' && (
             <div className="space-y-8">
               {/* Doctor Header Intro */}
               <div className="flex flex-col sm:flex-row gap-5 items-start sm:items-center">
                 <img
-                  src={doctor.profilePicture}
+                  src={doctor.profilePicture || 'https://placehold.co/160x160?text=Dr'}
                   alt={`${doctor.firstName} ${doctor.lastName}`}
                   referrerPolicy="no-referrer"
                   className="w-20 h-20 rounded-full object-cover border-2 border-sprout shadow-resting"
                 />
                 <div className="space-y-1">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xs font-sans font-semibold text-moss uppercase tracking-wider bg-sprout/30 px-2.5 py-0.5 rounded-full">
-                      {doctor.specialization}
-                    </span>
-                  </div>
                   <h3 className="font-display font-bold text-2xl text-forest">
                     Dr. {doctor.firstName} {doctor.lastName}
                   </h3>
-                  <div className="flex items-center space-x-3 text-sm">
-                    <div className="flex items-center text-saffron">
-                      {renderStars(doctor.rating)}
-                      <span className="ml-1.5 font-sans font-semibold text-ink">{doctor.rating}</span>
+                  {averageRating !== null ? (
+                    <div className="flex items-center space-x-3 text-sm">
+                      <div className="flex items-center text-saffron">
+                        {renderStars(averageRating)}
+                        <span className="ml-1.5 font-sans font-semibold text-ink">{averageRating.toFixed(1)}</span>
+                      </div>
+                      <span className="text-hairline">|</span>
+                      <span className="text-ink-soft text-xs">{doctor.reviews.length} Patient Reviews</span>
                     </div>
-                    <span className="text-hairline">|</span>
-                    <span className="text-ink-soft text-xs">{doctor.reviews.length} Patient Reviews</span>
-                  </div>
+                  ) : (
+                    <span className="text-ink-soft text-xs">No patient reviews yet</span>
+                  )}
                 </div>
               </div>
 
@@ -161,17 +192,23 @@ export default function DoctorDetailModal({ doctor, onClose }: DoctorDetailModal
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-hairline">
                 <div className="md:col-span-2 space-y-4">
                   <h4 className="font-display font-semibold text-base text-forest">About</h4>
-                  <p className="text-xs sm:text-sm text-ink-soft leading-relaxed">{doctor.bio}</p>
+                  <p className="text-xs sm:text-sm text-ink-soft leading-relaxed">
+                    {doctor.professionalBio || 'This practitioner has not added a biography yet.'}
+                  </p>
 
-                  <h4 className="font-display font-semibold text-base text-forest pt-2">Qualifications</h4>
-                  <ul className="space-y-1.5 list-none pl-0">
-                    {doctor.qualifications.map((qual, idx) => (
-                      <li key={idx} className="flex items-start text-xs text-ink-soft">
-                        <span className="text-mint mr-2">✦</span>
-                        <span>{qual}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  {doctor.qualifications.length > 0 && (
+                    <>
+                      <h4 className="font-display font-semibold text-base text-forest pt-2">Qualifications</h4>
+                      <ul className="space-y-1.5 list-none pl-0">
+                        {doctor.qualifications.map((qual, idx) => (
+                          <li key={idx} className="flex items-start text-xs text-ink-soft">
+                            <span className="text-mint mr-2">✦</span>
+                            <span>{qual}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
                 </div>
 
                 <div className="bg-cream/40 rounded-sub p-4 border border-hairline space-y-4">
@@ -189,17 +226,19 @@ export default function DoctorDetailModal({ doctor, onClose }: DoctorDetailModal
                     </div>
                   </div>
 
-                  <div>
-                    <span className="block text-[11px] font-sans font-bold text-moss uppercase tracking-wider">Gender</span>
-                    <span className="block text-xs font-sans text-ink-soft mt-1">{doctor.gender}</span>
-                  </div>
+                  {doctor.gender && (
+                    <div>
+                      <span className="block text-[11px] font-sans font-bold text-moss uppercase tracking-wider">Gender</span>
+                      <span className="block text-xs font-sans text-ink-soft mt-1">{doctor.gender}</span>
+                    </div>
+                  )}
 
-                  <div>
-                    <span className="block text-[11px] font-sans font-bold text-moss uppercase tracking-wider">Consultation Fee</span>
-                    <span className="block text-sm font-sans text-forest font-semibold mt-1">
-                      From <span className="font-mono text-base font-bold">LKR {doctor.price.toLocaleString()}</span>
-                    </span>
-                  </div>
+                  {doctor.slotDurationMinutes != null && (
+                    <div>
+                      <span className="block text-[11px] font-sans font-bold text-moss uppercase tracking-wider">Session Length</span>
+                      <span className="block text-xs font-sans text-ink-soft mt-1">{doctor.slotDurationMinutes} minutes</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -213,9 +252,9 @@ export default function DoctorDetailModal({ doctor, onClose }: DoctorDetailModal
                   </span>
                 </div>
 
-                {doctor.slots.length > 0 ? (
+                {doctor.availableSlots.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {doctor.slots.map((slot) => {
+                    {doctor.availableSlots.map((slot) => {
                       const isSelected = selectedSlot?.id === slot.id;
                       return (
                         <button
@@ -228,13 +267,17 @@ export default function DoctorDetailModal({ doctor, onClose }: DoctorDetailModal
                           }`}
                         >
                           <div className="flex justify-between items-center w-full">
-                            <span className="text-xs font-sans font-semibold text-ink">{slot.timeRange}</span>
+                            <span className="text-xs font-sans font-semibold text-ink">
+                              {formatTimeRange(slot.startTime, slot.endTime)}
+                            </span>
                             {isSelected && <div className="w-2 h-2 rounded-full bg-forest" />}
                           </div>
                           <div className="flex justify-between items-baseline mt-2">
-                            <span className="text-[11px] font-sans text-ink-soft">Duration: {slot.duration} mins</span>
+                            <span className="text-[11px] font-sans text-ink-soft">
+                              Duration: {slotDurationMinutes(slot.startTime, slot.endTime)} mins
+                            </span>
                             <span className="font-mono text-sm font-semibold text-forest">
-                              LKR {slot.price.toLocaleString()}
+                              LKR {slot.priceLkr.toLocaleString()}
                             </span>
                           </div>
                         </button>
@@ -252,14 +295,17 @@ export default function DoctorDetailModal({ doctor, onClose }: DoctorDetailModal
                   <div className="p-3 bg-cream/50 rounded-sub border border-hairline mt-2">
                     <p className="text-[11px] font-sans text-ink-soft">
                       <span className="font-semibold text-forest">Appointment Details:</span> Standard session is{' '}
-                      <span className="font-mono font-medium">{selectedSlot.duration} minutes</span>.{' '}
-                      {selectedSlot.extraTimePrice && selectedSlot.extraTimeMinutes ? (
+                      <span className="font-mono font-medium">
+                        {slotDurationMinutes(selectedSlot.startTime, selectedSlot.endTime)} minutes
+                      </span>
+                      .{' '}
+                      {doctor.extraTimePriceLkr && doctor.extraTimeMinutes ? (
                         <>
                           If needed, you can extend the session for{' '}
                           <span className="font-mono text-forest font-semibold">
-                            LKR {selectedSlot.extraTimePrice}
+                            LKR {doctor.extraTimePriceLkr}
                           </span>{' '}
-                          per additional <span className="font-mono">{selectedSlot.extraTimeMinutes} minutes</span>.
+                          per additional <span className="font-mono">{doctor.extraTimeMinutes} minutes</span>.
                         </>
                       ) : (
                         'No additional extension charges apply.'
@@ -270,28 +316,32 @@ export default function DoctorDetailModal({ doctor, onClose }: DoctorDetailModal
               </div>
 
               {/* Patient Reviews */}
-              <div className="pt-6 border-t border-hairline space-y-4">
-                <h4 className="font-display font-semibold text-base text-forest">Patient Reviews</h4>
-                <div className="space-y-4 max-h-64 overflow-y-auto pr-1">
-                  {doctor.reviews.map((rev) => (
-                    <div key={rev.id} className="bg-cream/20 p-4 rounded-sub border border-hairline space-y-2">
-                      <div className="flex justify-between items-center text-xs">
-                        <span className="font-sans font-semibold text-forest">{rev.reviewerNickname}</span>
-                        <span className="font-sans text-ink-faint">{rev.relativeDate}</span>
+              {doctor.reviews.length > 0 && (
+                <div className="pt-6 border-t border-hairline space-y-4">
+                  <h4 className="font-display font-semibold text-base text-forest">Patient Reviews</h4>
+                  <div className="space-y-4 max-h-64 overflow-y-auto pr-1">
+                    {doctor.reviews.map((rev) => (
+                      <div key={rev.id} className="bg-cream/20 p-4 rounded-sub border border-hairline space-y-2">
+                        <div className="flex justify-between items-center text-xs">
+                          <span className="font-sans font-semibold text-forest">{rev.reviewerNickname}</span>
+                          <span className="font-sans text-ink-faint">
+                            {new Date(rev.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          </span>
+                        </div>
+                        <div className="text-saffron">{renderStars(rev.rating)}</div>
+                        <p className="text-xs text-ink-soft leading-relaxed italic">"{rev.reviewText}"</p>
                       </div>
-                      <div className="text-saffron">{renderStars(rev.rating)}</div>
-                      <p className="text-xs text-ink-soft leading-relaxed italic">"{rev.reviewText}"</p>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Booking Action */}
               <div className="pt-6 border-t border-hairline flex flex-col sm:flex-row justify-between items-center gap-4 bg-cream/20 -mx-6 sm:-mx-8 -mb-6 sm:-mb-8 p-6">
                 <div className="text-center sm:text-left">
                   {selectedSlot ? (
                     <p className="text-xs text-ink-soft">
-                      Selected: <span className="font-semibold text-ink">{selectedSlot.timeRange}</span>
+                      Selected: <span className="font-semibold text-ink">{formatTimeRange(selectedSlot.startTime, selectedSlot.endTime)}</span>
                     </p>
                   ) : (
                     <p className="text-xs text-clay font-medium">Please select an appointment slot to proceed</p>
@@ -314,7 +364,7 @@ export default function DoctorDetailModal({ doctor, onClose }: DoctorDetailModal
             </div>
           )}
 
-          {bookingStep === 'form' && (
+          {doctor && bookingStep === 'form' && (
             <form onSubmit={handleConfirmBooking} className="space-y-6">
               <div className="bg-sprout/20 border border-sprout/40 rounded-sub p-4 flex items-start space-x-3">
                 <Shield className="w-5 h-5 text-forest shrink-0 mt-0.5" />
@@ -395,19 +445,23 @@ export default function DoctorDetailModal({ doctor, onClose }: DoctorDetailModal
                 <div className="space-y-1 text-xs">
                   <div className="flex justify-between">
                     <span className="text-ink-soft">Specialist:</span>
-                    <span className="font-semibold text-ink">Dr. {doctor.firstName} {doctor.lastName} ({doctor.specialization})</span>
+                    <span className="font-semibold text-ink">Dr. {doctor.firstName} {doctor.lastName}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-ink-soft">Selected Slot:</span>
-                    <span className="font-semibold text-ink">{selectedSlot?.timeRange}</span>
+                    <span className="font-semibold text-ink">
+                      {selectedSlot ? formatTimeRange(selectedSlot.startTime, selectedSlot.endTime) : ''}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-ink-soft">Duration:</span>
-                    <span className="font-semibold text-ink">{selectedSlot?.duration} mins</span>
+                    <span className="font-semibold text-ink">
+                      {selectedSlot ? slotDurationMinutes(selectedSlot.startTime, selectedSlot.endTime) : 0} mins
+                    </span>
                   </div>
                   <div className="flex justify-between border-t border-hairline pt-2 mt-2">
                     <span className="font-semibold text-forest">Total Due (LKR):</span>
-                    <span className="font-mono font-bold text-forest">LKR {selectedSlot?.price.toLocaleString()}</span>
+                    <span className="font-mono font-bold text-forest">LKR {selectedSlot?.priceLkr.toLocaleString()}</span>
                   </div>
                 </div>
               </div>
@@ -454,7 +508,11 @@ export default function DoctorDetailModal({ doctor, onClose }: DoctorDetailModal
                   {referenceCode}
                 </span>
                 <p className="text-[10px] text-ink-faint">
-                  Please copy and write down this secret code. It is your only ticket to enter the session waiting room at <span className="font-semibold">{selectedSlot?.timeRange}</span>.
+                  Please copy and write down this secret code. It is your only ticket to enter the session waiting room at{' '}
+                  <span className="font-semibold">
+                    {selectedSlot ? formatTimeRange(selectedSlot.startTime, selectedSlot.endTime) : ''}
+                  </span>
+                  .
                 </p>
               </div>
 

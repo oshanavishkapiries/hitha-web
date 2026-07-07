@@ -87,9 +87,6 @@ export default function MyAppointmentsModal({ onClose }: MyAppointmentsModalProp
                     />
                     <div>
                       <h4 className="font-display font-semibold text-sm text-forest">{apt.doctorName}</h4>
-                      <p className="text-[10px] text-moss font-semibold uppercase tracking-wider">
-                        {apt.doctorSpecialization}
-                      </p>
                     </div>
 
                     <button
