@@ -44,11 +44,14 @@ export interface DoctorProfileCompletionRequest {
 export interface DoctorProfileUpdateRequest {
   firstName?: string;
   lastName?: string;
-  phoneNumber?: string;
-  biography?: string;
-  specialties?: string[];
+  profilePicture?: string;
+  professionalBio?: string;
+  slmcLicenseNumber?: string;
+  email?: string;
+  gender?: string;
   languages?: string[];
-  consultationFee?: number;
+  qualifications?: string[];
+  documents?: string[];
 }
 
 export interface BlockedDateRequest {
@@ -145,5 +148,10 @@ export const getDoctorPriceRequests = async (): Promise<ApiResponse<any[]>> => {
 
 export const submitDoctorPriceRequest = async (payload: { requestedPrice: number; justification?: string }): Promise<ApiResponse<any>> => {
   const response = await axiosInstance.post<ApiResponse<any>>(ENDPOINTS.doctors.priceRequests, payload);
+  return response.data;
+};
+
+export const deleteDoctorProfile = async (): Promise<ApiResponse<any>> => {
+  const response = await axiosInstance.delete<ApiResponse<any>>(ENDPOINTS.doctors.me);
   return response.data;
 };

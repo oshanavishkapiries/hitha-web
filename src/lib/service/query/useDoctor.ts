@@ -14,6 +14,7 @@ import {
   submitDoctorPriceRequest,
   completeDoctorProfileOnboarding,
   updateDoctorProfilePicture,
+  deleteDoctorProfile,
   DoctorProfileUpdateRequest,
   DoctorProfileCompletionRequest,
   BlockedDateRequest,
@@ -204,6 +205,24 @@ export const useSubmitPriceRequest = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["doctor_price_requests"] });
+    },
+  });
+};
+
+export const useDeleteDoctorProfile = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const res = await deleteDoctorProfile();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to delete profile");
+      }
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["doctor_profile"] });
+      queryClient.invalidateQueries({ queryKey: ["doctor_summary"] });
     },
   });
 };
