@@ -1,22 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Search, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, ChevronDown, ChevronUp } from 'lucide-react';
 import { navigateTo } from '../utils/navigation';
-import HithaDatePicker from './HithaDatePicker';
+import { Specialization } from '../types';
 
 export default function SearchHeroBar() {
   const [name, setName] = useState('');
-  const [category, setCategory] = useState('');
-  const [date, setDate] = useState('');
+  const [category, setCategory] = useState<Specialization | ''>('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [specSearch, setSpecSearch] = useState('');
 
-  const specializations = [
-    'Psychiatry',
-    'Psychology',
-    'Counseling',
-    'Neurology',
-    'Cardiology'
+  const specializations: Specialization[] = [
+    'Counselor',
+    'Clinical Counselor',
+    'Psychologist',
+    'Clinical Psychologist',
+    'Medical Officer (Psychiatry Diploma)',
+    'Consultant Psychiatrist',
   ];
 
   const filteredSpecs = specializations.filter((spec) =>
@@ -25,35 +24,12 @@ export default function SearchHeroBar() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Map human-friendly category to system Specialization query param
-    let mappedCategory = category;
-    if (category === 'Psychiatry') {
-      mappedCategory = 'Consultant Psychiatrist'; // Match psychiatrist
-    } else if (category === 'Psychology') {
-      mappedCategory = 'Clinical Psychologist'; // Match psychologist
-    } else if (category === 'Counseling') {
-      mappedCategory = 'Clinical Counselor'; // Match counselor
-    }
 
     navigateTo('/search', {
       name: name || undefined,
-      category: (mappedCategory as any) || undefined,
-      date: date || undefined,
+      category: category || undefined,
       page: 1,
     });
-  };
-
-  // Helper to format date for display
-  const formatDisplayDate = (dateStr: string) => {
-    if (!dateStr) return 'Select Date';
-    try {
-      const d = new Date(dateStr);
-      if (isNaN(d.getTime())) return dateStr;
-      return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-    } catch {
-      return dateStr;
-    }
   };
 
   return (
@@ -82,10 +58,7 @@ export default function SearchHeroBar() {
         <div className="relative lg:flex-1 w-full">
           <button
             type="button"
-            onClick={() => {
-              setIsDropdownOpen(!isDropdownOpen);
-              setIsDatePickerOpen(false);
-            }}
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="w-full bg-[#152B22] hover:bg-[#1A3429] border border-[#2B4E41] hover:border-mint/40 rounded-[14px] lg:rounded-full px-5 py-3 lg:py-3.5 text-left text-sm text-white flex items-center justify-between cursor-pointer transition-all outline-none"
             id="hero-spec-dropdown-trigger"
           >
@@ -153,35 +126,6 @@ export default function SearchHeroBar() {
                 </div>
               </div>
             </>
-          )}
-        </div>
-
-        {/* Premium Hitha Date Selector */}
-        <div className="relative lg:flex-1 w-full">
-          <button
-            type="button"
-            onClick={() => {
-              setIsDatePickerOpen(!isDatePickerOpen);
-              setIsDropdownOpen(false);
-            }}
-            className="w-full bg-[#152B22] hover:bg-[#1A3429] border border-[#2B4E41] hover:border-mint/40 rounded-[14px] lg:rounded-full px-5 py-3 lg:py-3.5 text-left text-sm text-white flex items-center justify-between cursor-pointer transition-all outline-none"
-            id="hero-datepicker-trigger"
-          >
-            <span className={date ? 'text-white font-medium' : 'text-sprout/50'}>
-              {formatDisplayDate(date)}
-            </span>
-            <Calendar className="text-sprout/60 w-4.5 h-4.5 shrink-0" />
-          </button>
-
-          {isDatePickerOpen && (
-            <HithaDatePicker
-              selectedDate={date}
-              onDateChange={(selectedDateStr) => {
-                setDate(selectedDateStr);
-                setIsDatePickerOpen(false);
-              }}
-              onClose={() => setIsDatePickerOpen(false)}
-            />
           )}
         </div>
 
