@@ -25,22 +25,20 @@ export default function AdminNavbar({ isRealDocsLoading = false, onLogout }: Adm
   };
 
   return (
-    <nav className="bg-[#0B1E17] border-b border-[#1A3429] sticky top-0 z-40 text-white shadow-resting" id="admin-navbar">
+    <nav
+      className={`sticky top-0 z-40 shadow-resting ${isLogin ? 'bg-white border-b border-hairline text-forest' : 'bg-[#0B1E17] border-b border-[#1A3429] text-white'}`}
+      id="admin-navbar"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`flex h-16 items-center ${isLogin ? 'justify-center' : 'justify-between'}`}>
-          
-          {/* Logo */}
           <div className="flex items-center">
-            <Logo theme="light" id="admin-nav-logo-btn" />
+            <Logo theme={isLogin ? 'dark' : 'light'} id="admin-nav-logo-btn" />
           </div>
 
-          {/* Search and Profile on the right (position end) */}
           {!isLogin && (
             <div className="flex items-center space-x-4">
-              {/* Search Trigger Button */}
               <button 
                 onClick={() => {
-                  // Focus the search input on the dashboard page if present
                   const searchInput = document.querySelector('input[placeholder*="Search doctor"]') || document.querySelector('input[type="text"]');
                   if (searchInput) {
                     (searchInput as HTMLInputElement).focus();
@@ -57,7 +55,6 @@ export default function AdminNavbar({ isRealDocsLoading = false, onLogout }: Adm
 
               <NotificationBell />
 
-              {/* Profile Element */}
               <div className="flex items-center space-x-2.5 pl-2 border-l border-[#1A3429]" id="admin-nav-profile">
                 <div className="w-8 h-8 rounded-full bg-mint/10 border border-mint/30 flex items-center justify-center font-bold text-mint text-xs">
                   AD
@@ -68,7 +65,6 @@ export default function AdminNavbar({ isRealDocsLoading = false, onLogout }: Adm
                 </div>
               </div>
 
-              {/* Sign Out Shortcut */}
               <button
                 onClick={handleLogout}
                 className="p-2 hover:bg-red-950/20 hover:text-red-300 rounded-full transition-all cursor-pointer text-sprout/50 focus:outline-none"

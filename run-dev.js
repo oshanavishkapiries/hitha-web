@@ -2,7 +2,7 @@ import { spawn } from 'child_process';
 
 // Discard extra arguments from the platform (e.g., --host which Next.js doesn't recognize)
 // and run Next.js dev server with strictly supported arguments.
-const child = spawn('npx', ['next', 'dev', '--port', '3000', '--hostname', '0.0.0.0'], {
+const child = spawn('npx', ['next', 'dev', '--port', '3010', '--hostname', '0.0.0.0'], {
   stdio: 'inherit',
   shell: true,
 });
