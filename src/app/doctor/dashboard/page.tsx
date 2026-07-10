@@ -26,11 +26,10 @@ export default function DoctorDashboard() {
   const { data: realProfile, isLoading: isProfileLoading, error: profileError } = useDoctorProfile();
   const updateStatusMutation = useUpdateDoctorStatus();
 
-  // Redirect to login if user is unauthorized/not logged in
+  // Surface non-auth data-fetch errors (real auth failures are handled centrally by the axios interceptor)
   useEffect(() => {
     if (summaryError || profileError) {
-      console.error("Dashboard authorization check failed:", summaryError || profileError);
-      navigateTo('/doctor/login');
+      showAlert(`API Error: ${getApiErrorMessage(summaryError || profileError, 'Failed to load dashboard data.')}`, "error");
     }
   }, [summaryError, profileError]);
 

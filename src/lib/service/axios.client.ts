@@ -50,7 +50,7 @@ const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue = [];
 };
 
-// Response Interceptor: Central 401 & Token Refresh Handler
+// Response Interceptor: Central Auth-Failure (401 & 403) & Token Refresh Handler
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -66,8 +66,9 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // 2. Handle 401 Unauthorized
-    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+    // 2. Handle Unauthorized/Forbidden (backend returns 403 for invalidated tokens too)
+    const isAuthFailure = error.response?.status === 401 || error.response?.status === 403;
+    if (isAuthFailure && originalRequest && !originalRequest._retry) {
       if (isRefreshing) {
         // Queue the request until the current refresh completes
         return new Promise((resolve, reject) => {

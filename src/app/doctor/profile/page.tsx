@@ -61,11 +61,10 @@ export default function DoctorProfilePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const documentInputRef = useRef<HTMLInputElement>(null);
 
-  // Redirect to login if user is unauthorized/not logged in
+  // Surface non-auth data-fetch errors (real auth failures are handled centrally by the axios interceptor)
   useEffect(() => {
     if (summaryError || profileError) {
-      console.error("Profile page authorization check failed:", summaryError || profileError);
-      navigateTo('/doctor/login');
+      showAlert(`API Error: ${getApiErrorMessage(summaryError || profileError, 'Failed to load profile data.')}`, "error");
     }
   }, [summaryError, profileError]);
 
