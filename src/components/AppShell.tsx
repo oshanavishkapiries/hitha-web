@@ -37,7 +37,7 @@ export default function AppShell({ children }: AppShellProps) {
     <div className="min-h-screen flex flex-col bg-cream font-sans selection:bg-sprout selection:text-forest">
       {/* Global Section-Specific Navigation Header */}
       {isAdminRoute ? (
-        pathname === '/admin/dashboard' ? null : (
+        pathname === '/admin/dashboard' || pathname === '/admin/doctors' ? null : (
           <AdminNavbar onLogout={() => handleLogout('admin')} />
         )
       ) : isDoctorRoute ? (
