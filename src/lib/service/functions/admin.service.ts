@@ -164,7 +164,7 @@ export interface AdminResendInviteResponse {
 }
 
 export interface AdminUserResponse {
-  id: string;
+  id: string | null;
   email: string;
   name?: string;
   role: AdminRole;

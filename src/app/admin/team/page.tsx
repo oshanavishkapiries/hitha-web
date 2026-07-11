@@ -230,7 +230,7 @@ export default function AdminTeamPage() {
                     const isInvited = user.status === "INVITED" || user.status === "EXPIRED";
                     const isSuspended = user.status === "SUSPENDED";
                     return (
-                      <tr key={user.id} className="border-b border-hairline hover:bg-cream/10 transition-colors">
+                      <tr key={user.id ?? user.email} className="border-b border-hairline hover:bg-cream/10 transition-colors">
                         <td className="py-4 px-4">
                           <div className="font-bold text-forest">{user.name || "—"}</div>
                           <div className="text-ink-soft">{user.email}</div>
@@ -241,7 +241,7 @@ export default function AdminTeamPage() {
                               <Dropdown
                                 options={ROLE_UPDATE_OPTIONS}
                                 value={user.role}
-                                onChange={(value) => handleRoleChange(user.id, value as AdminRole)}
+                                onChange={(value) => handleRoleChange(user.id!, value as AdminRole)}
                                 buttonClassName="w-full bg-white border border-forest/40 rounded-lg px-3 py-1.5 text-xs text-ink flex justify-between items-center cursor-pointer transition-all outline-none"
                               />
                             </div>
@@ -281,7 +281,7 @@ export default function AdminTeamPage() {
                             )}
                             {!isInvited && isSuspended && (
                               <button
-                                onClick={() => handleActivate(user.id)}
+                                onClick={() => handleActivate(user.id!)}
                                 disabled={activateMutation.isPending}
                                 className="px-3 py-1.5 bg-mint/20 hover:bg-mint/40 text-forest rounded-lg text-[10px] font-bold transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
                               >
@@ -291,7 +291,7 @@ export default function AdminTeamPage() {
                             )}
                             {!isInvited && !isSuspended && (
                               <button
-                                onClick={() => handleSuspend(user.id)}
+                                onClick={() => handleSuspend(user.id!)}
                                 disabled={suspendMutation.isPending}
                                 className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-lg text-[10px] font-bold transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
                               >
