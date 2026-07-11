@@ -36,7 +36,7 @@ export default function BlogPreviewModal({ blogId, onClose }: BlogPreviewModalPr
           ) : (
             <>
               {blog.coverImage && (
-                <img src={blog.coverImage} alt={blog.title} className="w-full max-h-64 object-cover rounded-2xl border border-hairline" />
+                <img src={blog.coverImage} alt={blog.title} className="w-full aspect-video object-cover rounded-2xl border border-hairline" />
               )}
               <h2 className="text-2xl font-display font-bold text-forest">{blog.title}</h2>
               <div className="flex flex-wrap gap-1.5">

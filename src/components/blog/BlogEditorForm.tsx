@@ -195,12 +195,12 @@ export default function BlogEditorForm({ blogId, backHref, afterSaveHref, upload
           <label className="block text-xs font-semibold text-ink-soft mb-1.5">Cover Image</label>
           {isReadOnly ? (
             coverImagePreview && (
-              <img src={coverImagePreview} alt={title} className="w-full max-h-72 object-cover rounded-2xl border border-hairline" />
+              <img src={coverImagePreview} alt={title} className="w-full aspect-video object-cover rounded-2xl border border-hairline" />
             )
           ) : (
             <div
               onClick={() => coverInputRef.current?.click()}
-              className="relative group w-full h-48 rounded-2xl overflow-hidden border-2 border-dashed border-hairline hover:border-mint bg-cream flex items-center justify-center cursor-pointer transition-colors"
+              className="relative group w-full aspect-video rounded-2xl overflow-hidden border-2 border-dashed border-hairline hover:border-mint bg-cream flex items-center justify-center cursor-pointer transition-colors"
             >
               {coverImagePreview ? (
                 <img src={coverImagePreview} alt="Cover preview" className="w-full h-full object-cover" />

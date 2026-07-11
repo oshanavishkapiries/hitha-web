@@ -105,7 +105,8 @@ body {
 
 .hitha-block-editor .ce-block__content,
 .hitha-block-editor .ce-toolbar__content {
-  max-width: 100%;
+  max-width: calc(100% - 56px);
+  margin-left: 56px;
 }
 
 .hitha-block-editor .ce-paragraph {
