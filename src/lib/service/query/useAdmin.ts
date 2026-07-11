@@ -7,6 +7,15 @@ import {
   approveDoctorApplication,
   rejectDoctorApplication,
   changeDoctorStatusUnified,
+  getAdminUsers,
+  inviteAdmin,
+  resendAdminInvitation,
+  suspendAdmin,
+  activateAdmin,
+  updateAdminRole,
+  GetAdminUsersParams,
+  AdminInviteRequest,
+  AdminRoleUpdateRequest,
 } from "../functions/admin.service";
 
 export const useDoctorApplications = () => {
@@ -92,6 +101,104 @@ export const useChangeDoctorStatus = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["doctor_applications"] });
+    },
+  });
+};
+
+export const useAdminUsers = (params?: GetAdminUsersParams) => {
+  return useQuery({
+    queryKey: ["admin_users", params],
+    queryFn: async () => {
+      const res = await getAdminUsers(params);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch admin users");
+      }
+      return res.data;
+    },
+  });
+};
+
+export const useInviteAdmin = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: AdminInviteRequest) => {
+      const res = await inviteAdmin(payload);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to invite admin");
+      }
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin_users"] });
+    },
+  });
+};
+
+export const useResendAdminInvitation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (email: string) => {
+      const res = await resendAdminInvitation({ email });
+      if (!res.success) {
+        throw new Error(res.message || "Failed to resend invitation");
+      }
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin_users"] });
+    },
+  });
+};
+
+export const useSuspendAdmin = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (authUserId: string) => {
+      const res = await suspendAdmin(authUserId);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to suspend admin");
+      }
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin_users"] });
+    },
+  });
+};
+
+export const useActivateAdmin = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (authUserId: string) => {
+      const res = await activateAdmin(authUserId);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to activate admin");
+      }
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin_users"] });
+    },
+  });
+};
+
+export const useUpdateAdminRole = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ authUserId, role }: { authUserId: string; role: string }) => {
+      const res = await updateAdminRole(authUserId, { role });
+      if (!res.success) {
+        throw new Error(res.message || "Failed to update admin role");
+      }
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin_users"] });
     },
   });
 };

@@ -18,6 +18,12 @@ export const ENDPOINTS = {
     approveDoctor: (id: string) => `/admin/doctors/${id}/approve`,
     rejectDoctor: (id: string) => `/admin/doctors/${id}/reject`,
     changeDoctorStatus: (id: string) => `/admin/doctors/${id}/status`,
+    invite: "/admin/invite",
+    resendInvite: "/admin/invite/resend",
+    users: "/admin/users",
+    suspend: (id: string) => `/admin/suspend/${id}`,
+    activate: (id: string) => `/admin/activate/${id}`,
+    role: (id: string) => `/admin/role/${id}`,
   },
   doctor: {
     login: "/doctor/login",

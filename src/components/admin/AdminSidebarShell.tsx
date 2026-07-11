@@ -5,17 +5,19 @@ import { motion, AnimatePresence } from 'motion/react';
 import Logo from '../Logo';
 import NotificationBell from '../NotificationBell';
 import { navigateTo } from '../../utils/navigation';
+import Cookies from 'js-cookie';
 import {
   IconTrendingUp,
   IconStethoscope,
   IconLogout,
   IconChevronLeft,
   IconChevronRight,
+  IconUsers,
 } from '@tabler/icons-react';
 import { useDoctorApplications } from '../../lib/service/query/useAdmin';
 
 interface AdminSidebarShellProps {
-  activeNav: 'overview' | 'doctors';
+  activeNav: 'overview' | 'doctors' | 'management';
   title: string;
   subtitle: string;
   titleAction?: React.ReactNode;
@@ -141,6 +143,35 @@ export default function AdminSidebarShell({
                 </span>
               )}
             </div>
+
+            {/* Admin Management Tab (SUPER_ADMIN only) */}
+            {Cookies.get("user_role") === "SUPER_ADMIN" && (
+              <button
+                onClick={() => navigateTo('/admin/management')}
+                className={`text-left rounded-xl text-xs font-semibold flex items-center transition-all duration-300 cursor-pointer ${
+                  isSidebarCollapsed ? 'justify-center p-3 w-12 h-12 mx-auto' : 'px-4 py-3 space-x-3 w-full'
+                } ${
+                  activeNav === 'management' ? 'bg-[#152B22] text-white font-bold border border-[#2B4E41]' : 'text-sprout/70 hover:bg-forest/20'
+                }`}
+                id="admin-tab-management"
+                title="Admin Management"
+              >
+                <IconUsers className="w-4 h-4 text-mint shrink-0" />
+                <AnimatePresence>
+                  {!isSidebarCollapsed && (
+                    <motion.span
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -8 }}
+                      transition={{ duration: 0.2, delay: 0.12 }}
+                      className="truncate"
+                    >
+                      Admin Management
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </button>
+            )}
           </nav>
         </div>
 

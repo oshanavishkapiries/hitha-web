@@ -121,3 +121,87 @@ export const changeDoctorStatusUnified = async (id: string, status: string, reas
   const response = await axiosInstance.post<ApiResponse>(`${ENDPOINTS.admin.changeDoctorStatus(id)}${query}`);
   return response.data;
 };
+
+// Admin invitation & management integration
+export interface AdminInviteRequest {
+  email: string;
+  role: string;
+}
+
+export interface ResendInviteRequest {
+  email: string;
+}
+
+export interface AdminRoleUpdateRequest {
+  role: string;
+}
+
+export interface AdminUserResponse {
+  id: string | null; // authUserId - null for pending/expired invites
+  email: string;
+  name: string;
+  role: string;
+  status: "ACTIVE" | "SUSPENDED" | "PENDING_INVITE" | "EXPIRED_INVITE";
+  invitedAt: string;
+  expiresAt?: string;
+}
+
+export interface AdminResendInviteResponse {
+  email: string;
+  expiresAt: string;
+}
+
+export interface AdminSuspendResponse {
+  adminId: string;
+  status: string;
+}
+
+export interface AdminRoleUpdateResponse {
+  adminId: string;
+  newRole: string;
+}
+
+export interface PageResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number; // 0-indexed current page
+  size: number;
+}
+
+export interface GetAdminUsersParams {
+  status?: string;
+  search?: string;
+  page?: number;
+  size?: number;
+}
+
+export const inviteAdmin = async (payload: AdminInviteRequest): Promise<ApiResponse<string>> => {
+  const response = await axiosInstance.post<ApiResponse<string>>(ENDPOINTS.admin.invite, payload);
+  return response.data;
+};
+
+export const resendAdminInvitation = async (payload: ResendInviteRequest): Promise<ApiResponse<AdminResendInviteResponse>> => {
+  const response = await axiosInstance.post<ApiResponse<AdminResendInviteResponse>>(ENDPOINTS.admin.resendInvite, payload);
+  return response.data;
+};
+
+export const getAdminUsers = async (params?: GetAdminUsersParams): Promise<ApiResponse<PageResponse<AdminUserResponse>>> => {
+  const response = await axiosInstance.get<ApiResponse<PageResponse<AdminUserResponse>>>(ENDPOINTS.admin.users, { params });
+  return response.data;
+};
+
+export const suspendAdmin = async (authUserId: string): Promise<ApiResponse<AdminSuspendResponse>> => {
+  const response = await axiosInstance.patch<ApiResponse<AdminSuspendResponse>>(ENDPOINTS.admin.suspend(authUserId));
+  return response.data;
+};
+
+export const activateAdmin = async (authUserId: string): Promise<ApiResponse<void>> => {
+  const response = await axiosInstance.patch<ApiResponse<void>>(ENDPOINTS.admin.activate(authUserId));
+  return response.data;
+};
+
+export const updateAdminRole = async (authUserId: string, payload: AdminRoleUpdateRequest): Promise<ApiResponse<AdminRoleUpdateResponse>> => {
+  const response = await axiosInstance.patch<ApiResponse<AdminRoleUpdateResponse>>(ENDPOINTS.admin.role(authUserId), payload);
+  return response.data;
+};

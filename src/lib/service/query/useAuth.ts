@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Cookies from "js-cookie";
-import { adminLogin, AdminLoginRequest } from "../functions/admin.service";
+import { adminLogin, AdminLoginRequest, adminRegister, AdminRegRequest } from "../functions/admin.service";
 import { doctorLogin, doctorRegister, DoctorLoginRequest, DoctorRegRequest } from "../functions/doctor.service";
 import {
   logoutSession,
@@ -29,6 +29,18 @@ export const useAdminLogin = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin_profile"] });
+    },
+  });
+};
+
+export const useAdminRegister = () => {
+  return useMutation({
+    mutationFn: async (payload: AdminRegRequest) => {
+      const res = await adminRegister(payload);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to register admin");
+      }
+      return res;
     },
   });
 };
