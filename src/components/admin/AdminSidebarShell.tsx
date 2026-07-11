@@ -32,7 +32,7 @@ export default function AdminSidebarShell({
   headerActions,
   children,
 }: AdminSidebarShellProps) {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const { data: realDocs } = useDoctorApplications();
   const pendingCount = (realDocs || []).filter((doc: any) => doc.status === 'PENDING_VERIFICATION').length;
