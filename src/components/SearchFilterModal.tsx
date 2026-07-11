@@ -61,7 +61,7 @@ export default function SearchFilterModal({ filters, onChange, onReset, onClose 
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-5">
+        <div className="flex-1 overflow-y-auto px-6 pt-6 pb-32 space-y-5">
           {/* Specialization Category */}
           <div className="space-y-1.5">
             <label className="block text-[11px] font-sans font-bold text-ink-soft uppercase tracking-wider">Category</label>
