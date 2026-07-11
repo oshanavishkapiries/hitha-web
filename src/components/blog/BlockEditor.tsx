@@ -30,6 +30,12 @@ const BlockEditor = forwardRef<BlockEditorHandle, BlockEditorProps>(
     const generatedId = useId().replace(/[:]/g, "-");
     const holderId = `hitha-block-editor-${generatedId}`;
     const editorRef = useRef<EditorJS | null>(null);
+    // Serializes construct/destroy across React Strict Mode's dev-only double effect
+    // invocation, so a phantom instance is never actually constructed into the shared
+    // holder (Editor.js's destroy() clears the whole holder's innerHTML, which would
+    // otherwise wipe out a second instance rendered before the first one's async
+    // destroy resolves).
+    const lifecycleRef = useRef<Promise<void>>(Promise.resolve());
 
     useImperativeHandle(ref, () => ({
       save: async () => {
@@ -41,60 +47,71 @@ const BlockEditor = forwardRef<BlockEditorHandle, BlockEditorProps>(
     }));
 
     useEffect(() => {
-      const editor = new EditorJS({
-        holder: holderId,
-        placeholder,
-        data: initialData && initialData.blocks?.length ? initialData : EMPTY_DATA,
-        autofocus: false,
-        tools: {
-          header: {
-            class: Header as any,
-            inlineToolbar: true,
-            config: { placeholder: "Heading", levels: [2, 3, 4], defaultLevel: 2 },
-          },
-          list: {
-            class: EditorjsList as any,
-            inlineToolbar: true,
-          },
-          quote: {
-            class: Quote as any,
-            inlineToolbar: true,
-          },
-          checklist: {
-            class: CheckList as any,
-            inlineToolbar: true,
-          },
-          delimiter: Delimiter as any,
-          marker: Marker as any,
-          inlineCode: InlineCode as any,
-          image: {
-            class: ImageTool as any,
-            config: {
-              uploader: {
-                uploadByFile: async (file: File) => {
-                  const res = await uploadFile(file, uploadFolder);
-                  if (!res.success || !res.data) {
-                    throw new Error(res.message || "Failed to upload image");
-                  }
-                  return { success: 1, file: { url: res.data } };
+      let isCurrent = true;
+
+      lifecycleRef.current = lifecycleRef.current.then(() => {
+        if (!isCurrent) {
+          return;
+        }
+
+        const editor = new EditorJS({
+          holder: holderId,
+          placeholder,
+          data: initialData && initialData.blocks?.length ? initialData : EMPTY_DATA,
+          autofocus: false,
+          tools: {
+            header: {
+              class: Header as any,
+              inlineToolbar: true,
+              config: { placeholder: "Heading", levels: [2, 3, 4], defaultLevel: 2 },
+            },
+            list: {
+              class: EditorjsList as any,
+              inlineToolbar: true,
+            },
+            quote: {
+              class: Quote as any,
+              inlineToolbar: true,
+            },
+            checklist: {
+              class: CheckList as any,
+              inlineToolbar: true,
+            },
+            delimiter: Delimiter as any,
+            marker: Marker as any,
+            inlineCode: InlineCode as any,
+            image: {
+              class: ImageTool as any,
+              config: {
+                uploader: {
+                  uploadByFile: async (file: File) => {
+                    const res = await uploadFile(file, uploadFolder);
+                    if (!res.success || !res.data) {
+                      throw new Error(res.message || "Failed to upload image");
+                    }
+                    return { success: 1, file: { url: res.data } };
+                  },
                 },
               },
             },
           },
-        },
+        });
+
+        editorRef.current = editor;
+        return editor.isReady;
       });
 
-      editorRef.current = editor;
-
       return () => {
-        editor.isReady
+        isCurrent = false;
+        lifecycleRef.current = lifecycleRef.current
           .then(() => {
-            editor.destroy();
+            const instance = editorRef.current;
+            editorRef.current = null;
+            return instance?.destroy();
           })
           .catch(() => {
-            /* editor was never mounted, nothing to clean up */
+            /* nothing to clean up, or the instance never finished initializing */
           });
-        editorRef.current = null;
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [holderId]);
