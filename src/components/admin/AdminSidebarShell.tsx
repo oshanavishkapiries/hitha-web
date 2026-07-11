@@ -11,14 +11,12 @@ import {
   IconLogout,
   IconChevronLeft,
   IconChevronRight,
-  IconClipboardCheck,
-  IconEdit,
   IconArticle,
 } from '@tabler/icons-react';
 import { useDoctorApplications, usePendingBlogs } from '../../lib/service/query/useAdmin';
 
 interface AdminSidebarShellProps {
-  activeNav: 'overview' | 'doctors' | 'blogs-review' | 'blogs-mine' | 'blogs-all';
+  activeNav: 'overview' | 'doctors' | 'blogs';
   title: string;
   subtitle: string;
   titleAction?: React.ReactNode;
@@ -43,14 +41,14 @@ export default function AdminSidebarShell({
   const pendingBlogCount = (pendingBlogs || []).length;
 
   return (
-    <div className="bg-[#FAF9F5] min-h-screen flex flex-row overflow-hidden" id="admin-dashboard-container">
+    <div className="bg-cream min-h-screen flex flex-row overflow-hidden" id="admin-dashboard-container">
 
       {/* Left Column (Sidebar) */}
-      <aside className={`bg-[#0B1E17] text-white shrink-0 flex flex-col border-r border-[#152B22] transition-all duration-300 h-screen overflow-y-auto ${
+      <aside className={`bg-ink text-white shrink-0 flex flex-col border-r border-[#1C3A54] transition-all duration-300 h-screen overflow-y-auto ${
         isSidebarCollapsed ? 'w-20' : 'w-64'
       }`} id="admin-sidebar">
         {/* Logo Element (Top section aligned with right header) */}
-        <div className="h-16 flex items-center px-6 border-b border-[#152B22] shrink-0 justify-between" id="admin-sidebar-logo-container">
+        <div className="h-16 flex items-center px-6 border-b border-[#1C3A54] shrink-0 justify-between" id="admin-sidebar-logo-container">
           <AnimatePresence mode="wait">
             {!isSidebarCollapsed ? (
               <motion.div
@@ -148,24 +146,18 @@ export default function AdminSidebarShell({
               )}
             </div>
 
-            {!isSidebarCollapsed && (
-              <div className="pt-4 mt-2 border-t border-[#152B22] text-[9px] font-bold uppercase tracking-wider text-sprout/40 px-4">
-                Blogs
-              </div>
-            )}
-
             <div className="relative">
               <button
-                onClick={() => navigateTo('/admin/blogs/pending')}
+                onClick={() => navigateTo('/admin/blogs')}
                 className={`text-left rounded-xl text-xs font-semibold flex items-center transition-all duration-300 cursor-pointer ${
                   isSidebarCollapsed ? 'justify-center p-3 w-12 h-12 mx-auto' : 'px-4 py-3 space-x-3 w-full'
                 } ${
-                  activeNav === 'blogs-review' ? 'bg-[#152B22] text-white font-bold border border-[#2B4E41]' : 'text-sprout/70 hover:bg-forest/20'
+                  activeNav === 'blogs' ? 'bg-[#152B22] text-white font-bold border border-[#2B4E41]' : 'text-sprout/70 hover:bg-forest/20'
                 }`}
-                id="admin-tab-blogs-review"
-                title="Review Queue"
+                id="admin-tab-blogs"
+                title="Blogs"
               >
-                <IconClipboardCheck className="w-4 h-4 text-mint shrink-0" />
+                <IconArticle className="w-4 h-4 text-mint shrink-0" />
                 <AnimatePresence>
                   {!isSidebarCollapsed && (
                     <motion.div
@@ -175,7 +167,7 @@ export default function AdminSidebarShell({
                       transition={{ duration: 0.2, delay: 0.08 }}
                       className="flex-1 flex justify-between items-center min-w-0"
                     >
-                      <span className="truncate">Review Queue</span>
+                      <span className="truncate">Blogs</span>
                       {pendingBlogCount > 0 && (
                         <span className="bg-red-500 text-white text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full shrink-0 ml-1">
                           {pendingBlogCount}
@@ -192,58 +184,6 @@ export default function AdminSidebarShell({
                 </span>
               )}
             </div>
-
-            <button
-              onClick={() => navigateTo('/admin/blogs')}
-              className={`text-left rounded-xl text-xs font-semibold flex items-center transition-all duration-300 cursor-pointer ${
-                isSidebarCollapsed ? 'justify-center p-3 w-12 h-12 mx-auto' : 'px-4 py-3 space-x-3 w-full'
-              } ${
-                activeNav === 'blogs-mine' ? 'bg-[#152B22] text-white font-bold border border-[#2B4E41]' : 'text-sprout/70 hover:bg-forest/20'
-              }`}
-              id="admin-tab-blogs-mine"
-              title="Admin Articles"
-            >
-              <IconEdit className="w-4 h-4 text-mint shrink-0" />
-              <AnimatePresence>
-                {!isSidebarCollapsed && (
-                  <motion.span
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -8 }}
-                    transition={{ duration: 0.2, delay: 0.1 }}
-                    className="truncate"
-                  >
-                    Admin Articles
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </button>
-
-            <button
-              onClick={() => navigateTo('/admin/blogs/all')}
-              className={`text-left rounded-xl text-xs font-semibold flex items-center transition-all duration-300 cursor-pointer ${
-                isSidebarCollapsed ? 'justify-center p-3 w-12 h-12 mx-auto' : 'px-4 py-3 space-x-3 w-full'
-              } ${
-                activeNav === 'blogs-all' ? 'bg-[#152B22] text-white font-bold border border-[#2B4E41]' : 'text-sprout/70 hover:bg-forest/20'
-              }`}
-              id="admin-tab-blogs-all"
-              title="All Blogs"
-            >
-              <IconArticle className="w-4 h-4 text-mint shrink-0" />
-              <AnimatePresence>
-                {!isSidebarCollapsed && (
-                  <motion.span
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -8 }}
-                    transition={{ duration: 0.2, delay: 0.12 }}
-                    className="truncate"
-                  >
-                    All Blogs
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </button>
           </nav>
         </div>
 
@@ -278,19 +218,19 @@ export default function AdminSidebarShell({
       <div className="flex-1 flex flex-col h-screen overflow-hidden" id="admin-main-column">
 
         {/* Top Header of Right Column */}
-        <header className="h-16 bg-white border-b border-[#EBE8DF] flex items-center justify-between px-6 shrink-0" id="admin-main-header">
+        <header className="h-16 bg-white border-b border-hairline flex items-center justify-between px-6 shrink-0" id="admin-main-header">
           {/* Header Left (Collapse button '<' / '>') */}
           <div className="flex items-center">
             <button
               onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-              className="p-1.5 border border-[#EBE8DF] rounded-lg bg-white text-[#0B1E17] hover:bg-[#FAF9F5] hover:text-[#0D241C] transition-all cursor-pointer focus:outline-none flex items-center justify-center shadow-sm"
+              className="p-1.5 border border-hairline rounded-lg bg-white text-ink hover:bg-cream hover:text-forest transition-all cursor-pointer focus:outline-none flex items-center justify-center shadow-sm"
               title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
               id="admin-sidebar-toggle-btn"
             >
               {isSidebarCollapsed ? (
-                <IconChevronRight className="w-4 h-4 text-[#0B1E17]" />
+                <IconChevronRight className="w-4 h-4 text-ink" />
               ) : (
-                <IconChevronLeft className="w-4 h-4 text-[#0B1E17]" />
+                <IconChevronLeft className="w-4 h-4 text-ink" />
               )}
             </button>
           </div>
@@ -302,20 +242,20 @@ export default function AdminSidebarShell({
             <NotificationBell variant="light" />
 
             {/* Profile Element */}
-            <div className="flex items-center space-x-2.5 pl-4 border-l border-[#EBE8DF]" id="admin-header-profile">
+            <div className="flex items-center space-x-2.5 pl-4 border-l border-hairline" id="admin-header-profile">
               <div className="w-8 h-8 rounded-full bg-mint/10 border border-mint/30 flex items-center justify-center font-bold text-mint text-xs">
                 AD
               </div>
               <div className="hidden sm:block text-left">
-                <h5 className="text-[11px] font-bold text-[#0B1E17] leading-tight">Admin Root</h5>
-                <span className="text-[9px] text-[#0B1E17]/50 block leading-none">admin@hitha.lk</span>
+                <h5 className="text-[11px] font-bold text-ink leading-tight">Admin Root</h5>
+                <span className="text-[9px] text-ink-soft block leading-none">admin@hitha.lk</span>
               </div>
             </div>
           </div>
         </header>
 
         {/* Admin Dashboard Core Display Panel */}
-        <main className="flex-1 p-6 sm:p-8 space-y-8 overflow-y-auto bg-[#FAF9F5]" id="admin-main-content">
+        <main className="flex-1 p-6 sm:p-8 space-y-8 overflow-y-auto bg-cream" id="admin-main-content">
 
           {/* Top Info Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-hairline pb-4" id="admin-title-row">

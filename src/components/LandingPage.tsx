@@ -7,7 +7,7 @@ export default function LandingPage() {
   return (
     <div className="bg-cream min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-visible bg-gradient-to-b from-[#142B22] to-[#1E4B3A] text-white pt-20 pb-28 px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-visible bg-gradient-to-b from-ink to-forest text-white pt-20 pb-28 px-4 sm:px-6 lg:px-8">
         {/* Background Image and Abstract Shapes with clipping container */}
         <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
           <img
@@ -21,8 +21,8 @@ export default function LandingPage() {
             }}
           />
           {/* Subtle background abstract shapes clipped within container */}
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#8FCB84] rounded-full filter blur-[120px] opacity-10" />
-          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-[#C9DFC7] rounded-full filter blur-[100px] opacity-10" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-mint rounded-full filter blur-[120px] opacity-10" />
+          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-sprout rounded-full filter blur-[100px] opacity-10" />
         </div>
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
@@ -56,8 +56,8 @@ export default function LandingPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Card 1 */}
-          <div className="bg-[#C9DFC7]/20 border border-sprout/40 rounded-card p-6 shadow-resting hover:shadow-elevated transition-all duration-300">
-            <div className="w-12 h-12 bg-[#C9DFC7]/40 rounded-[14px] flex items-center justify-center mb-5 text-forest">
+          <div className="bg-sprout/20 border border-sprout/40 rounded-card p-6 shadow-resting hover:shadow-elevated transition-all duration-300">
+            <div className="w-12 h-12 bg-sprout/40 rounded-[14px] flex items-center justify-center mb-5 text-forest">
               <Lock className="w-6 h-6" />
             </div>
             <h3 className="font-display font-semibold text-lg text-forest mb-2">100% Anonymous</h3>
@@ -67,8 +67,8 @@ export default function LandingPage() {
           </div>
 
           {/* Card 2 */}
-          <div className="bg-[#C9DFC7]/20 border border-sprout/40 rounded-card p-6 shadow-resting hover:shadow-elevated transition-all duration-300">
-            <div className="w-12 h-12 bg-[#C9DFC7]/40 rounded-[14px] flex items-center justify-center mb-5 text-forest">
+          <div className="bg-sprout/20 border border-sprout/40 rounded-card p-6 shadow-resting hover:shadow-elevated transition-all duration-300">
+            <div className="w-12 h-12 bg-sprout/40 rounded-[14px] flex items-center justify-center mb-5 text-forest">
               <Award className="w-6 h-6" />
             </div>
             <h3 className="font-display font-semibold text-lg text-forest mb-2">Certified Specialists</h3>
@@ -78,8 +78,8 @@ export default function LandingPage() {
           </div>
 
           {/* Card 3 */}
-          <div className="bg-[#C9DFC7]/20 border border-sprout/40 rounded-card p-6 shadow-resting hover:shadow-elevated transition-all duration-300">
-            <div className="w-12 h-12 bg-[#C9DFC7]/40 rounded-[14px] flex items-center justify-center mb-5 text-forest">
+          <div className="bg-sprout/20 border border-sprout/40 rounded-card p-6 shadow-resting hover:shadow-elevated transition-all duration-300">
+            <div className="w-12 h-12 bg-sprout/40 rounded-[14px] flex items-center justify-center mb-5 text-forest">
               <CreditCard className="w-6 h-6" />
             </div>
             <h3 className="font-display font-semibold text-lg text-forest mb-2">Secure Escrow</h3>
@@ -89,8 +89,8 @@ export default function LandingPage() {
           </div>
 
           {/* Card 4 */}
-          <div className="bg-[#C9DFC7]/20 border border-sprout/40 rounded-card p-6 shadow-resting hover:shadow-elevated transition-all duration-300">
-            <div className="w-12 h-12 bg-[#C9DFC7]/40 rounded-[14px] flex items-center justify-center mb-5 text-forest">
+          <div className="bg-sprout/20 border border-sprout/40 rounded-card p-6 shadow-resting hover:shadow-elevated transition-all duration-300">
+            <div className="w-12 h-12 bg-sprout/40 rounded-[14px] flex items-center justify-center mb-5 text-forest">
               <Globe className="w-6 h-6" />
             </div>
             <h3 className="font-display font-semibold text-lg text-forest mb-2">Trilingual Support</h3>

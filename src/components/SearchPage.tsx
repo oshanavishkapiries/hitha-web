@@ -130,7 +130,7 @@ export default function SearchPage() {
   return (
     <div className="bg-cream min-h-screen">
       {/* Hero Header */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#142B22] to-[#1E4B3A] text-white pt-12 pb-14 px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden bg-gradient-to-b from-ink to-forest text-white pt-12 pb-14 px-4 sm:px-6 lg:px-8">
         <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
           <img
             src={HERO_BG_IMAGE}
@@ -142,8 +142,8 @@ export default function SearchPage() {
               WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0) 100%)',
             }}
           />
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#8FCB84] rounded-full filter blur-[120px] opacity-10" />
-          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-[#C9DFC7] rounded-full filter blur-[100px] opacity-10" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-mint rounded-full filter blur-[120px] opacity-10" />
+          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-sprout rounded-full filter blur-[100px] opacity-10" />
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10 space-y-6">
@@ -166,7 +166,7 @@ export default function SearchPage() {
 
           {/* Search + Filters Pill */}
           <div
-            className="bg-[#0B1E17] border border-[#1E4B3A]/80 rounded-[24px] sm:rounded-full p-3 shadow-2xl flex flex-col sm:flex-row gap-3 items-stretch"
+            className="bg-ink border border-forest/80 rounded-[24px] sm:rounded-full p-3 shadow-2xl flex flex-col sm:flex-row gap-3 items-stretch"
             id="search-pill"
           >
             <div className="relative flex-1">
@@ -176,7 +176,7 @@ export default function SearchPage() {
                 value={nameInput}
                 onChange={(e) => setNameInput(e.target.value)}
                 placeholder="Search Doctor Name"
-                className="w-full bg-[#152B22] hover:bg-[#1A3429] focus:bg-[#1A3429] border border-[#2B4E41] focus:border-mint/50 rounded-[14px] sm:rounded-full pl-11 pr-4 py-3 text-white text-sm outline-none transition-all placeholder:text-sprout/50 font-sans"
+                className="w-full bg-[#12283C] hover:bg-[#1A3752] focus:bg-[#1A3752] border border-[#204566] focus:border-mint/50 rounded-[14px] sm:rounded-full pl-11 pr-4 py-3 text-white text-sm outline-none transition-all placeholder:text-sprout/50 font-sans"
                 id="filter-name"
               />
             </div>
@@ -184,13 +184,13 @@ export default function SearchPage() {
             <button
               type="button"
               onClick={() => setIsFilterModalOpen(true)}
-              className="relative shrink-0 bg-[#152B22] hover:bg-[#1A3429] border border-[#2B4E41] hover:border-mint/40 rounded-[14px] sm:rounded-full px-5 py-3 text-sm text-white flex items-center justify-center gap-2 cursor-pointer transition-all outline-none"
+              className="relative shrink-0 bg-[#12283C] hover:bg-[#1A3752] border border-[#204566] hover:border-mint/40 rounded-[14px] sm:rounded-full px-5 py-3 text-sm text-white flex items-center justify-center gap-2 cursor-pointer transition-all outline-none"
               id="open-filters-btn"
             >
               <SlidersHorizontal className="w-4 h-4 text-sprout/70" />
               <span className="font-sans font-medium">Filters</span>
               {activeChips.length > 0 && (
-                <span className="bg-mint text-[#0B1E17] text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="bg-mint text-mint-text text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
                   {activeChips.length}
                 </span>
               )}

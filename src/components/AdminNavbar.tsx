@@ -26,7 +26,7 @@ export default function AdminNavbar({ isRealDocsLoading = false, onLogout }: Adm
 
   return (
     <nav
-      className={`sticky top-0 z-40 shadow-resting ${isLogin ? 'bg-white border-b border-hairline text-forest' : 'bg-[#0B1E17] border-b border-[#1A3429] text-white'}`}
+      className={`sticky top-0 z-40 shadow-resting ${isLogin ? 'bg-white border-b border-hairline text-forest' : 'bg-ink border-b border-[#204566] text-white'}`}
       id="admin-navbar"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -46,7 +46,7 @@ export default function AdminNavbar({ isRealDocsLoading = false, onLogout }: Adm
                     alert("Click on the SLMC Verifications tab to search doctors directly.");
                   }
                 }}
-                className="p-2 hover:bg-[#152B22] rounded-full transition-all text-sprout/80 hover:text-white cursor-pointer focus:outline-none"
+                className="p-2 hover:bg-[#163650] rounded-full transition-all text-sprout/80 hover:text-white cursor-pointer focus:outline-none"
                 title="Search Dashboard"
                 id="admin-nav-search-btn"
               >
@@ -55,7 +55,7 @@ export default function AdminNavbar({ isRealDocsLoading = false, onLogout }: Adm
 
               <NotificationBell />
 
-              <div className="flex items-center space-x-2.5 pl-2 border-l border-[#1A3429]" id="admin-nav-profile">
+              <div className="flex items-center space-x-2.5 pl-2 border-l border-[#204566]" id="admin-nav-profile">
                 <div className="w-8 h-8 rounded-full bg-mint/10 border border-mint/30 flex items-center justify-center font-bold text-mint text-xs">
                   AD
                 </div>
