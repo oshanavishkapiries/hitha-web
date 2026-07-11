@@ -2,7 +2,16 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Cookies from "js-cookie";
-import { adminLogin, AdminLoginRequest } from "../functions/admin.service";
+import {
+  adminLogin,
+  adminRegister,
+  adminSendCode,
+  adminVerifyCode,
+  AdminLoginRequest,
+  AdminRegRequest,
+  SendCodeRequest as AdminSendCodeRequest,
+  VerifyCodeRequest as AdminVerifyCodeRequest,
+} from "../functions/admin.service";
 import { doctorLogin, doctorRegister, DoctorLoginRequest, DoctorRegRequest } from "../functions/doctor.service";
 import {
   logoutSession,
@@ -29,6 +38,47 @@ export const useAdminLogin = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin_profile"] });
+    },
+  });
+};
+
+export const useAdminRegister = () => {
+  return useMutation({
+    mutationFn: async (payload: AdminRegRequest) => {
+      const res = await adminRegister(payload);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to register admin");
+      }
+      return res;
+    },
+  });
+};
+
+export const useAdminSendCode = () => {
+  return useMutation({
+    mutationFn: async (payload: AdminSendCodeRequest) => {
+      const res = await adminSendCode(payload);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to send verification code");
+      }
+      return res;
+    },
+  });
+};
+
+export const useAdminVerifyCode = () => {
+  return useMutation({
+    mutationFn: async (payload: AdminVerifyCodeRequest) => {
+      const res = await adminVerifyCode(payload);
+      if (!res.success || !res.data?.verified) {
+        throw new Error(res.message || "Invalid or expired verification code");
+      }
+      if (res.data.accessToken && res.data.refreshToken) {
+        Cookies.set("accesstoken", res.data.accessToken, { expires: 1, path: "/" });
+        Cookies.set("refreshtoken", res.data.refreshToken, { expires: 7, path: "/" });
+        Cookies.set("user_role", res.data.role || "ADMIN", { expires: 7, path: "/" });
+      }
+      return res;
     },
   });
 };

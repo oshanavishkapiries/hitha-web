@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import Cookies from 'js-cookie';
 import Logo from '../Logo';
 import NotificationBell from '../NotificationBell';
 import { navigateTo } from '../../utils/navigation';
@@ -12,11 +13,12 @@ import {
   IconChevronLeft,
   IconChevronRight,
   IconArticle,
+  IconUsersGroup,
 } from '@tabler/icons-react';
 import { useDoctorApplications, usePendingBlogs } from '../../lib/service/query/useAdmin';
 
 interface AdminSidebarShellProps {
-  activeNav: 'overview' | 'doctors' | 'blogs';
+  activeNav: 'overview' | 'doctors' | 'blogs' | 'team';
   title: string;
   subtitle: string;
   titleAction?: React.ReactNode;
@@ -33,6 +35,11 @@ export default function AdminSidebarShell({
   children,
 }: AdminSidebarShellProps) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+
+  useEffect(() => {
+    setIsSuperAdmin(Cookies.get('user_role') === 'SUPER_ADMIN');
+  }, []);
 
   const { data: realDocs } = useDoctorApplications();
   const pendingCount = (realDocs || []).filter((doc: any) => doc.status === 'PENDING_VERIFICATION').length;
@@ -184,6 +191,34 @@ export default function AdminSidebarShell({
                 </span>
               )}
             </div>
+
+            {isSuperAdmin && (
+              <button
+                onClick={() => navigateTo('/admin/team')}
+                className={`text-left rounded-xl text-xs font-semibold flex items-center transition-all duration-300 cursor-pointer ${
+                  isSidebarCollapsed ? 'justify-center p-3 w-12 h-12 mx-auto' : 'px-4 py-3 space-x-3 w-full'
+                } ${
+                  activeNav === 'team' ? 'bg-forest-muted text-white font-bold border border-forest-border' : 'text-sprout/70 hover:bg-forest/20'
+                }`}
+                id="admin-tab-team"
+                title="Admin Team"
+              >
+                <IconUsersGroup className="w-4 h-4 text-mint shrink-0" />
+                <AnimatePresence>
+                  {!isSidebarCollapsed && (
+                    <motion.span
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -8 }}
+                      transition={{ duration: 0.2, delay: 0.1 }}
+                      className="truncate"
+                    >
+                      Admin Team
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </button>
+            )}
           </nav>
         </div>
 

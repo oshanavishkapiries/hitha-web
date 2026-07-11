@@ -21,6 +21,12 @@ export const ENDPOINTS = {
     pendingBlogs: "/admin/blogs/pending",
     approveBlog: (id: string) => `/admin/blogs/${id}/approve`,
     rejectBlog: (id: string) => `/admin/blogs/${id}/reject`,
+    invite: "/admin/invite",
+    resendInvite: "/admin/invite/resend",
+    users: "/admin/users",
+    updateRole: (id: string) => `/admin/role/${id}`,
+    suspend: (id: string) => `/admin/suspend/${id}`,
+    activate: (id: string) => `/admin/activate/${id}`,
   },
   doctor: {
     login: "/doctor/login",

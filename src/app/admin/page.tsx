@@ -9,7 +9,8 @@ export default function AdminIndexPage() {
     const accessToken = Cookies.get("accesstoken");
     const role = Cookies.get("user_role");
     
-    if (accessToken && role === "ADMIN") {
+    const validRoles = ["SUPER_ADMIN", "ADMIN", "FINANCIAL_ADMIN", "CONTENT_ADMIN"];
+    if (accessToken && role && validRoles.includes(role)) {
       navigateTo('/admin/dashboard');
     } else {
       navigateTo('/admin/login');

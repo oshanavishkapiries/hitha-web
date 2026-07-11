@@ -1,6 +1,6 @@
 import axiosInstance from "../axios.client";
 import { ENDPOINTS } from "../endpoints";
-import { ApiResponse } from "./auth.service";
+import { ApiResponse, VerifyCodeResponse } from "./auth.service";
 import { BlogResponse } from "./blog.service";
 
 export interface AdminLoginRequest {
@@ -53,8 +53,14 @@ export const adminLogin = async (payload: AdminLoginRequest): Promise<ApiRespons
   return response.data;
 };
 
-export const adminRegister = async (payload: AdminRegRequest): Promise<ApiResponse> => {
-  const response = await axiosInstance.post<ApiResponse>(ENDPOINTS.admin.register, payload);
+export interface AdminRegResponse {
+  adminId: string;
+  email: string;
+  role: string;
+}
+
+export const adminRegister = async (payload: AdminRegRequest): Promise<ApiResponse<AdminRegResponse>> => {
+  const response = await axiosInstance.post<ApiResponse<AdminRegResponse>>(ENDPOINTS.admin.register, payload);
   return response.data;
 };
 
@@ -63,8 +69,8 @@ export const adminSendCode = async (payload: SendCodeRequest): Promise<ApiRespon
   return response.data;
 };
 
-export const adminVerifyCode = async (payload: VerifyCodeRequest): Promise<ApiResponse> => {
-  const response = await axiosInstance.post<ApiResponse>(ENDPOINTS.admin.verifyCode, payload);
+export const adminVerifyCode = async (payload: VerifyCodeRequest): Promise<ApiResponse<VerifyCodeResponse>> => {
+  const response = await axiosInstance.post<ApiResponse<VerifyCodeResponse>>(ENDPOINTS.admin.verifyCode, payload);
   return response.data;
 };
 
@@ -140,5 +146,84 @@ export const approveBlog = async (id: string): Promise<ApiResponse> => {
 
 export const rejectBlog = async (id: string, reason: string): Promise<ApiResponse> => {
   const response = await axiosInstance.post<ApiResponse>(ENDPOINTS.admin.rejectBlog(id), { reason });
+  return response.data;
+};
+
+export type InvitableAdminRole = "ADMIN" | "FINANCIAL_ADMIN" | "CONTENT_ADMIN";
+export type AdminRole = "SUPER_ADMIN" | InvitableAdminRole;
+export type AdminUserStatus = "ACTIVE" | "INVITED" | "EXPIRED" | "SUSPENDED";
+
+export interface AdminInviteRequest {
+  email: string;
+  role: InvitableAdminRole;
+}
+
+export interface AdminResendInviteResponse {
+  email: string;
+  expiresAt: string;
+}
+
+export interface AdminUserResponse {
+  id: string;
+  email: string;
+  name?: string;
+  role: AdminRole;
+  status: AdminUserStatus | string;
+  invitedAt?: string;
+  expiresAt?: string;
+}
+
+export interface GetAdminUsersParams {
+  status?: AdminUserStatus;
+  search?: string;
+  page?: number;
+  size?: number;
+}
+
+export interface PageAdminUserResponse {
+  content: AdminUserResponse[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+}
+
+export interface AdminRoleUpdateResponse {
+  adminId: string;
+  newRole: string;
+}
+
+export interface AdminSuspendResponse {
+  adminId: string;
+  status: string;
+}
+
+export const inviteAdmin = async (payload: AdminInviteRequest): Promise<ApiResponse<string>> => {
+  const response = await axiosInstance.post<ApiResponse<string>>(ENDPOINTS.admin.invite, payload);
+  return response.data;
+};
+
+export const resendAdminInvite = async (email: string): Promise<ApiResponse<AdminResendInviteResponse>> => {
+  const response = await axiosInstance.post<ApiResponse<AdminResendInviteResponse>>(ENDPOINTS.admin.resendInvite, { email });
+  return response.data;
+};
+
+export const getAdminUsers = async (params?: GetAdminUsersParams): Promise<ApiResponse<PageAdminUserResponse>> => {
+  const response = await axiosInstance.get<ApiResponse<PageAdminUserResponse>>(ENDPOINTS.admin.users, { params });
+  return response.data;
+};
+
+export const updateAdminRole = async (id: string, role: AdminRole): Promise<ApiResponse<AdminRoleUpdateResponse>> => {
+  const response = await axiosInstance.patch<ApiResponse<AdminRoleUpdateResponse>>(ENDPOINTS.admin.updateRole(id), { role });
+  return response.data;
+};
+
+export const suspendAdmin = async (id: string): Promise<ApiResponse<AdminSuspendResponse>> => {
+  const response = await axiosInstance.patch<ApiResponse<AdminSuspendResponse>>(ENDPOINTS.admin.suspend(id));
+  return response.data;
+};
+
+export const activateAdmin = async (id: string): Promise<ApiResponse> => {
+  const response = await axiosInstance.patch<ApiResponse>(ENDPOINTS.admin.activate(id));
   return response.data;
 };
