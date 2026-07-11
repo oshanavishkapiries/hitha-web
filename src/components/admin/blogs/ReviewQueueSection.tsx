@@ -67,7 +67,8 @@ export default function ReviewQueueSection() {
           {pendingBlogs.map((blog: any) => (
             <div
               key={blog.id}
-              className="bg-white border border-hairline rounded-2xl p-5 flex items-center gap-4 shadow-resting"
+              onClick={() => setPreviewId(blog.id)}
+              className="bg-white border border-hairline hover:border-forest/30 shadow-resting hover:shadow-elevated rounded-2xl p-5 flex items-center gap-4 transition-all duration-300 cursor-pointer"
             >
               {blog.coverImage ? (
                 <img src={blog.coverImage} alt={blog.title} className="w-16 h-16 rounded-xl object-cover border border-hairline shrink-0" />
@@ -86,14 +87,10 @@ export default function ReviewQueueSection() {
 
               <div className="flex items-center gap-2 shrink-0">
                 <button
-                  onClick={() => setPreviewId(blog.id)}
-                  className="p-2.5 rounded-xl border border-hairline text-ink-soft hover:border-forest/30 hover:text-forest transition-all cursor-pointer"
-                  title="Preview"
-                >
-                  <IconEye className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => handleApprove(blog.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleApprove(blog.id);
+                  }}
                   disabled={approveMutation.isPending}
                   className="bg-forest text-white hover:bg-forest/90 text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
                 >
@@ -101,7 +98,10 @@ export default function ReviewQueueSection() {
                   <span>Approve</span>
                 </button>
                 <button
-                  onClick={() => setRejectId(blog.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setRejectId(blog.id);
+                  }}
                   className="bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   <IconX className="w-3.5 h-3.5" />

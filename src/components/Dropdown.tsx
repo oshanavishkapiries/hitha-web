@@ -14,9 +14,10 @@ interface DropdownProps {
   onChange: (value: string) => void;
   placeholder?: string;
   id?: string;
+  buttonClassName?: string;
 }
 
-export default function Dropdown({ options, value, onChange, placeholder = 'Select an option', id }: DropdownProps) {
+export default function Dropdown({ options, value, onChange, placeholder = 'Select an option', id, buttonClassName }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const selectedLabel = options.find(opt => opt.value === value)?.label;
 
@@ -25,7 +26,7 @@ export default function Dropdown({ options, value, onChange, placeholder = 'Sele
       <button
         type="button"
         onClick={() => setIsOpen(prev => !prev)}
-        className="w-full bg-cream border border-hairline focus:border-forest/50 focus:bg-white rounded-xl px-4 py-3 text-sm text-ink flex justify-between items-center cursor-pointer transition-all outline-none"
+        className={buttonClassName || "w-full bg-cream border border-hairline focus:border-forest/50 focus:bg-white rounded-xl px-4 py-3 text-sm text-ink flex justify-between items-center cursor-pointer transition-all outline-none"}
         id={id}
       >
         <span className={value ? 'text-ink font-semibold' : 'text-ink-soft/40'}>

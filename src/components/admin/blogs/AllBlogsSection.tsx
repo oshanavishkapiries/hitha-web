@@ -62,15 +62,16 @@ export default function AllBlogsSection() {
             value={status}
             onChange={(value) => setStatus(value as BlogStatus | "")}
             placeholder="All statuses"
+            buttonClassName="w-full bg-white border border-hairline focus:border-forest/50 rounded-xl px-4 py-2.5 text-sm text-ink flex justify-between items-center cursor-pointer transition-all outline-none"
           />
         </div>
       </div>
 
       <div className="mt-6">
         {isLoading ? (
-          <div className="space-y-4 animate-pulse">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 animate-pulse">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white h-24 rounded-2xl border border-hairline" />
+              <div key={i} className="bg-white h-56 rounded-2xl border border-hairline" />
             ))}
           </div>
         ) : !blogs || blogs.length === 0 ? (
@@ -80,41 +81,58 @@ export default function AllBlogsSection() {
             <p className="text-xs text-ink-soft max-w-sm mx-auto">Try adjusting your search or status filter.</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
             {blogs.map((blog: any) => (
-              <div
+              <button
                 key={blog.id}
-                className="bg-white border border-hairline rounded-2xl p-5 flex items-center gap-4 shadow-resting"
+                type="button"
+                onClick={() => setPreviewId(blog.id)}
+                className="group bg-white border border-hairline hover:border-forest/30 shadow-resting hover:shadow-elevated rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer flex flex-col text-left outline-none"
               >
-                {blog.coverImage ? (
-                  <img src={blog.coverImage} alt={blog.title} className="w-14 h-14 rounded-xl object-cover border border-hairline shrink-0" />
-                ) : (
-                  <div className="w-14 h-14 rounded-xl bg-cream border border-hairline flex items-center justify-center shrink-0">
-                    <BookOpen className="w-5 h-5 text-sprout" />
-                  </div>
-                )}
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${STATUS_STYLES[blog.status] || STATUS_STYLES.DRAFT}`}>
+                {/* Thumbnail Focus Header */}
+                <div className="relative w-full aspect-video bg-cream overflow-hidden border-b border-hairline shrink-0">
+                  {blog.coverImage ? (
+                    <img 
+                      src={blog.coverImage} 
+                      alt={blog.title} 
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102" 
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <BookOpen className="w-8 h-8 text-sprout" />
+                    </div>
+                  )}
+                  {/* Status Badge in thumbnail */}
+                  <div className="absolute top-3 left-3 flex flex-wrap gap-1">
+                    <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border shadow-sm ${STATUS_STYLES[blog.status] || STATUS_STYLES.DRAFT}`}>
                       {blog.status.replace(/_/g, " ")}
                     </span>
-                    <span className="text-[9px] font-semibold text-ink-faint bg-cream px-2 py-0.5 rounded-full">
-                      {blog.authorType}
-                    </span>
                   </div>
-                  <h3 className="font-display font-bold text-forest text-sm truncate">{blog.title}</h3>
-                  <p className="text-[11px] text-ink-soft mt-0.5">By {blog.author?.name || "Unknown"}</p>
                 </div>
 
-                <button
-                  onClick={() => setPreviewId(blog.id)}
-                  className="p-2.5 rounded-xl border border-hairline text-ink-soft hover:border-forest/30 hover:text-forest transition-all cursor-pointer shrink-0"
-                  title="Preview"
-                >
-                  <IconEye className="w-4 h-4" />
-                </button>
-              </div>
+                {/* Card Content */}
+                <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+                  <div className="space-y-1">
+                    <h3 className="font-display font-bold text-forest text-sm line-clamp-2 leading-snug group-hover:text-forest-hover transition-colors">
+                      {blog.title}
+                    </h3>
+                    <p className="text-[11px] text-ink-soft">By {blog.author?.name || "Unknown"}</p>
+                  </div>
+
+                  {/* Footer info */}
+                  <div className="flex items-center justify-between pt-2 border-t border-hairline/60 text-[9px] font-semibold text-ink-faint">
+                    <span className="bg-cream px-2 py-0.5 rounded-full uppercase border border-hairline">
+                      {blog.authorType}
+                    </span>
+                    {blog.status === "PUBLISHED" && (
+                      <span className="flex items-center gap-1">
+                        <IconEye className="w-3.5 h-3.5" />
+                        <span>{blog.views || 0}</span>
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </button>
             ))}
           </div>
         )}
