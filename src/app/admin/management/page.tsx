@@ -278,10 +278,11 @@ function AdminManagementContent() {
                                 {!isSelf && (
                                   <button
                                     onClick={() => setActiveAdminIdForSuspend(user.id)}
-                                    className="p-2 bg-yellow-50 hover:bg-yellow-100 text-yellow-800 rounded-lg cursor-pointer transition-colors border border-yellow-200 flex items-center justify-center"
+                                    className="px-2.5 py-1.5 bg-yellow-50 hover:bg-yellow-100 text-yellow-800 rounded-lg cursor-pointer transition-colors border border-yellow-200 flex items-center space-x-1"
                                     title="Suspend User"
                                   >
                                     <IconUserX className="w-3.5 h-3.5" />
+                                    <span className="font-semibold text-[10px]">Suspend</span>
                                   </button>
                                 )}
                               </>
@@ -291,10 +292,11 @@ function AdminManagementContent() {
                             {isSuspended && (
                               <button
                                 onClick={() => handleActivate(user.id!)}
-                                className="p-2 bg-mint/10 hover:bg-mint/20 text-forest rounded-lg cursor-pointer transition-colors border border-mint/20 flex items-center justify-center"
+                                className="px-2.5 py-1.5 bg-mint/10 hover:bg-mint/20 text-forest rounded-lg cursor-pointer transition-colors border border-mint/20 flex items-center space-x-1"
                                 title="Activate User"
                               >
                                 <IconUserCheck className="w-3.5 h-3.5" />
+                                <span className="font-semibold text-[10px]">Activate</span>
                               </button>
                             )}
 
