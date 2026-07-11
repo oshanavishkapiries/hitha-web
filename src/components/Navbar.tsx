@@ -1,4 +1,4 @@
-import { BookOpen, CalendarRange } from 'lucide-react';
+import { CalendarRange } from 'lucide-react';
 import { navigateTo } from '../utils/navigation';
 import Logo from './Logo';
 
@@ -21,10 +21,9 @@ export default function Navbar({ onOpenAppointments, onOpenBlogs }: NavbarProps)
             {/* Blogs Navlink */}
             <button
               onClick={onOpenBlogs}
-              className="flex items-center space-x-1.5 text-xs sm:text-sm font-sans font-semibold text-ink-soft hover:text-forest transition-colors cursor-pointer focus:outline-none"
+              className="text-xs sm:text-sm font-sans font-semibold text-ink-soft hover:text-forest transition-colors cursor-pointer focus:outline-none"
               id="nav-blogs-btn"
             >
-              <BookOpen className="w-4 h-4 text-moss" />
               <span>Blogs</span>
             </button>
             
