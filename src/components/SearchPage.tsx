@@ -176,7 +176,7 @@ export default function SearchPage() {
                 value={nameInput}
                 onChange={(e) => setNameInput(e.target.value)}
                 placeholder="Search Doctor Name"
-                className="w-full bg-[#12283C] hover:bg-[#1A3752] focus:bg-[#1A3752] border border-[#204566] focus:border-mint/50 rounded-[14px] sm:rounded-full pl-11 pr-4 py-3 text-white text-sm outline-none transition-all placeholder:text-sprout/50 font-sans"
+                className="w-full bg-[#152B22] hover:bg-[#1A3429] focus:bg-[#1A3429] border border-[#2B4E41] focus:border-mint/50 rounded-[14px] sm:rounded-full pl-11 pr-4 py-3 text-white text-sm outline-none transition-all placeholder:text-sprout/50 font-sans"
                 id="filter-name"
               />
             </div>
@@ -184,7 +184,7 @@ export default function SearchPage() {
             <button
               type="button"
               onClick={() => setIsFilterModalOpen(true)}
-              className="relative shrink-0 bg-[#12283C] hover:bg-[#1A3752] border border-[#204566] hover:border-mint/40 rounded-[14px] sm:rounded-full px-5 py-3 text-sm text-white flex items-center justify-center gap-2 cursor-pointer transition-all outline-none"
+              className="relative shrink-0 bg-[#152B22] hover:bg-[#1A3429] border border-[#2B4E41] hover:border-mint/40 rounded-[14px] sm:rounded-full px-5 py-3 text-sm text-white flex items-center justify-center gap-2 cursor-pointer transition-all outline-none"
               id="open-filters-btn"
             >
               <SlidersHorizontal className="w-4 h-4 text-sprout/70" />

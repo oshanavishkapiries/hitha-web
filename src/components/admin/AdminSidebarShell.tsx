@@ -44,11 +44,11 @@ export default function AdminSidebarShell({
     <div className="bg-cream min-h-screen flex flex-row overflow-hidden" id="admin-dashboard-container">
 
       {/* Left Column (Sidebar) */}
-      <aside className={`bg-ink text-white shrink-0 flex flex-col border-r border-[#1C3A54] transition-all duration-300 h-screen overflow-y-auto ${
+      <aside className={`bg-ink text-white shrink-0 flex flex-col border-r border-[#152B22] transition-all duration-300 h-screen overflow-y-auto ${
         isSidebarCollapsed ? 'w-20' : 'w-64'
       }`} id="admin-sidebar">
         {/* Logo Element (Top section aligned with right header) */}
-        <div className="h-16 flex items-center px-6 border-b border-[#1C3A54] shrink-0 justify-between" id="admin-sidebar-logo-container">
+        <div className="h-16 flex items-center px-6 border-b border-[#152B22] shrink-0 justify-between" id="admin-sidebar-logo-container">
           <AnimatePresence mode="wait">
             {!isSidebarCollapsed ? (
               <motion.div

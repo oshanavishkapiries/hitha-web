@@ -6,20 +6,20 @@
   --font-display: "Poppins", "Noto Sans Sinhala", "Noto Sans Tamil", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
-  --color-cream: #E8F6F1;
-  --color-mint: #00A8B5;
-  --color-mint-dark: #008A95;
-  --color-mint-text: #0A2A38;
-  --color-forest: #0D3B66;
-  --color-moss: #4CAF50;
-  --color-sprout: #A8D672;
+  --color-cream: #F7F4EC;
+  --color-mint: #8FCB84;
+  --color-mint-dark: #6EAE64;
+  --color-mint-text: #123227;
+  --color-forest: #1E4B3A;
+  --color-moss: #6B8F71;
+  --color-sprout: #C9DFC7;
   --color-saffron: #D4A24C;
   --color-clay: #B5533C;
   --color-clay-tint: #F4E2DD;
-  --color-ink: #081A29;
-  --color-ink-soft: #3A4E5E;
-  --color-ink-faint: #6A8094;
-  --color-hairline: #C2DDD5;
+  --color-ink: #1B2420;
+  --color-ink-soft: #4B564F;
+  --color-ink-faint: #8A9490;
+  --color-hairline: #E2DCCB;
 
   --radius-card: 22px;
   --radius-sub: 14px;

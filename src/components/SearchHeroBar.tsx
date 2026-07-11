@@ -49,7 +49,7 @@ export default function SearchHeroBar() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Search Doctor Name"
-            className="w-full bg-[#12283C] hover:bg-[#1A3752] focus:bg-[#1A3752] border border-[#204566] focus:border-mint/50 rounded-[14px] lg:rounded-full pl-11 pr-4 py-3 lg:py-3.5 text-white text-sm outline-none transition-all placeholder:text-sprout/50 font-sans"
+            className="w-full bg-[#152B22] hover:bg-[#1A3429] focus:bg-[#1A3429] border border-[#2B4E41] focus:border-mint/50 rounded-[14px] lg:rounded-full pl-11 pr-4 py-3 lg:py-3.5 text-white text-sm outline-none transition-all placeholder:text-sprout/50 font-sans"
             id="hero-name-search-input"
           />
         </div>
@@ -59,7 +59,7 @@ export default function SearchHeroBar() {
           <button
             type="button"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="w-full bg-[#12283C] hover:bg-[#1A3752] border border-[#204566] hover:border-mint/40 rounded-[14px] lg:rounded-full px-5 py-3 lg:py-3.5 text-left text-sm text-white flex items-center justify-between cursor-pointer transition-all outline-none"
+            className="w-full bg-[#152B22] hover:bg-[#1A3429] border border-[#2B4E41] hover:border-mint/40 rounded-[14px] lg:rounded-full px-5 py-3 lg:py-3.5 text-left text-sm text-white flex items-center justify-between cursor-pointer transition-all outline-none"
             id="hero-spec-dropdown-trigger"
           >
             <span className={category ? 'text-white font-medium' : 'text-sprout/50'}>
@@ -81,7 +81,7 @@ export default function SearchHeroBar() {
                 onClick={() => setIsDropdownOpen(false)} 
               />
               <div 
-                className="absolute top-full left-0 right-0 mt-2 bg-ink border border-[#204566] rounded-[16px] shadow-2xl p-3 z-50 animate-fade-in flex flex-col gap-2"
+                className="absolute top-full left-0 right-0 mt-2 bg-ink border border-[#2B4E41] rounded-[16px] shadow-2xl p-3 z-50 animate-fade-in flex flex-col gap-2"
                 id="hero-spec-dropdown-panel"
               >
                 {/* Search field within dropdown */}
@@ -91,7 +91,7 @@ export default function SearchHeroBar() {
                     value={specSearch}
                     onChange={(e) => setSpecSearch(e.target.value)}
                     placeholder="Search specialization..."
-                    className="w-full bg-[#12283C] border border-[#204566] text-white text-xs rounded-[10px] px-3 py-2 outline-none focus:border-mint/50 placeholder:text-sprout/40"
+                    className="w-full bg-[#152B22] border border-[#2B4E41] text-white text-xs rounded-[10px] px-3 py-2 outline-none focus:border-mint/50 placeholder:text-sprout/40"
                     id="hero-spec-search-input"
                     autoFocus
                   />
@@ -111,8 +111,8 @@ export default function SearchHeroBar() {
                         }}
                         className={`w-full text-left px-3 py-2.5 rounded-[10px] text-xs transition-colors flex items-center justify-between cursor-pointer ${
                           category === spec
-                            ? 'bg-mint text-white font-semibold'
-                            : 'text-white hover:bg-[#1A3752]'
+                            ? 'bg-mint text-mint-text font-semibold'
+                            : 'text-white hover:bg-[#1A3429]'
                         }`}
                       >
                         <span>{spec}</span>
@@ -132,7 +132,7 @@ export default function SearchHeroBar() {
         {/* Search Submit Button */}
         <button
           type="submit"
-          className="bg-mint hover:bg-mint-dark text-white font-sans font-bold text-sm px-6 py-3 lg:py-3.5 rounded-[14px] lg:rounded-full transition-all duration-300 shadow-md hover:shadow-lg transform active:scale-95 flex items-center justify-center space-x-2 cursor-pointer shrink-0"
+          className="bg-mint hover:bg-mint-dark text-mint-text font-sans font-bold text-sm px-6 py-3 lg:py-3.5 rounded-[14px] lg:rounded-full transition-all duration-300 shadow-md hover:shadow-lg transform active:scale-95 flex items-center justify-center space-x-2 cursor-pointer shrink-0"
           id="hero-submit-btn"
         >
           <Search className="w-4 h-4" />
