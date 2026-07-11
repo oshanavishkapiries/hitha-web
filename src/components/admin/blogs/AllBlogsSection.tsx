@@ -8,6 +8,7 @@ import { useAlert } from "../../../context/AlertContext";
 import { getApiErrorMessage } from "../../../utils/errors";
 import BlogPreviewModal from "../../blog/BlogPreviewModal";
 import type { BlogStatus } from "../../../lib/service/functions/blog.service";
+import Dropdown from "../../Dropdown";
 
 const STATUS_STYLES: Record<string, string> = {
   DRAFT: "bg-white border-hairline text-ink-soft",
@@ -18,6 +19,11 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 const STATUS_OPTIONS: (BlogStatus | "")[] = ["", "DRAFT", "PENDING_REVIEW", "PUBLISHED", "REJECTED", "SUSPENDED"];
+
+const statusOptions = STATUS_OPTIONS.map((opt) => ({
+  value: opt,
+  label: opt ? opt.replace(/_/g, " ") : "All statuses",
+}));
 
 export default function AllBlogsSection() {
   const { showAlert } = useAlert();
@@ -50,17 +56,14 @@ export default function AllBlogsSection() {
             className="w-full bg-white border border-hairline focus:border-forest/50 rounded-xl pl-10 pr-4 py-2.5 text-sm text-ink outline-none transition-all"
           />
         </div>
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value as BlogStatus | "")}
-          className="bg-white border border-hairline focus:border-forest/50 rounded-xl px-4 py-2.5 text-sm text-ink outline-none transition-all cursor-pointer"
-        >
-          {STATUS_OPTIONS.map((opt) => (
-            <option key={opt} value={opt}>
-              {opt ? opt.replace(/_/g, " ") : "All statuses"}
-            </option>
-          ))}
-        </select>
+        <div className="w-full sm:w-48">
+          <Dropdown
+            options={statusOptions}
+            value={status}
+            onChange={(value) => setStatus(value as BlogStatus | "")}
+            placeholder="All statuses"
+          />
+        </div>
       </div>
 
       <div className="mt-6">
