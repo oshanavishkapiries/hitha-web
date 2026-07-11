@@ -40,8 +40,7 @@ function AdminDoctorRegistryContent() {
   const [actionType, setActionType] = useState<'reject' | 'suspend' | null>(null);
   const [actionReason, setActionReason] = useState<string>('');
 
-  // Admin search popup visibility state
-  const [isDoctorSearchPopupOpen, setIsDoctorSearchPopupOpen] = useState(false);
+
 
   // Doctor details popup state
   const [viewDoctorId, setViewDoctorId] = useState<string | null>(null);
@@ -171,17 +170,6 @@ function AdminDoctorRegistryContent() {
         activeNav="doctors"
         title="Doctor Registry"
         subtitle="Manage approved practitioners, audit statuses, or verify incoming registration requests."
-        headerActions={
-          <button
-            onClick={() => setIsDoctorSearchPopupOpen(true)}
-            className="bg-[#FAF9F5] border border-[#EBE8DF] hover:bg-cream hover:text-forest transition-all text-[#0B1E17] text-xs font-bold rounded-xl px-4 py-1.5 flex items-center space-x-1.5 shadow-sm cursor-pointer focus:outline-none"
-            title="Search Current Section"
-            id="dashboard-header-search-btn"
-          >
-            <IconSearch className="w-4 h-4 text-forest animate-pulse" />
-            <span>Search</span>
-          </button>
-        }
         titleAction={
           <button
             onClick={() => {
@@ -206,6 +194,18 @@ function AdminDoctorRegistryContent() {
         }
       >
         <div className="bg-white p-6 sm:p-8 rounded-3xl border border-hairline shadow-resting space-y-6">
+
+          {/* Table Search Input */}
+          <div className="relative">
+            <IconSearch className="w-4 h-4 text-ink-faint absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search by doctor name or SLMC license number..."
+              className="w-full bg-cream border border-hairline focus:border-forest/50 focus:bg-white rounded-xl pl-10 pr-4 py-2.5 text-sm text-ink outline-none transition-all"
+            />
+          </div>
 
           {/* View 1: Doctor Registration Requests */}
           {doctorSubView === 'requests' && (
@@ -452,44 +452,7 @@ function AdminDoctorRegistryContent() {
         </div>
       </AdminSidebarShell>
 
-      {/* Admin Doctor Registry Search Popup */}
-      {isDoctorSearchPopupOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-forest/30 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white rounded-3xl p-6 w-full max-w-md border border-hairline shadow-elevated relative">
-            <div className="flex justify-between items-center pb-4 border-b border-hairline mb-4">
-              <h3 className="font-display font-bold text-forest flex items-center gap-2">
-                <IconSearch className="w-4 h-4 text-mint" />
-                <span>Search Doctors Directory</span>
-              </h3>
-              <button
-                onClick={() => setIsDoctorSearchPopupOpen(false)}
-                className="p-1 hover:bg-[#FAF9F5] rounded-lg transition-all cursor-pointer"
-              >
-                <IconX className="w-4 h-4 text-ink-soft" />
-              </button>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-[10px] font-bold text-forest uppercase tracking-wider mb-1">Doctor Name or SLMC No.</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Dr. Sanduni or SLMC-9321"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full bg-[#FAF9F5] border border-[#EBE8DF] text-xs text-[#0B1E17] font-semibold rounded-xl px-3.5 py-2.5 outline-none focus:border-forest"
-                />
-              </div>
-              <button
-                onClick={() => setIsDoctorSearchPopupOpen(false)}
-                className="w-full bg-forest hover:bg-forest/95 text-white text-xs font-bold py-2.5 rounded-xl cursor-pointer transition-all flex items-center justify-center space-x-2"
-              >
-                <IconSearch className="w-4 h-4 text-mint" />
-                <span>Apply Search Filter</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
 
       {/* Suspend Doctor Popup */}
       {activeActionDocId && actionType === 'suspend' && (
