@@ -1,4 +1,13 @@
 import { FilterParams, Specialization } from '../types';
+import type { useRouter } from 'next/navigation';
+
+type NextRouter = ReturnType<typeof useRouter>;
+
+let routerInstance: NextRouter | null = null;
+
+export function registerRouter(router: NextRouter) {
+  routerInstance = router;
+}
 
 export function getQueryParams(): FilterParams {
   if (typeof window === 'undefined') {
@@ -56,7 +65,11 @@ export function navigateTo(path: string, params?: Partial<FilterParams>) {
   }
   
   if (window.location.pathname !== path) {
-    window.location.href = url.toString();
+    if (routerInstance) {
+      routerInstance.push(url.pathname + url.search);
+    } else {
+      window.location.href = url.toString();
+    }
   } else {
     window.history.pushState({}, '', url.toString());
     // Dispatch a custom event to notify listeners of path changes

@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import '../index.css';
 import QueryProvider from '../components/providers/query-provider';
 import { AlertProvider } from '../context/AlertContext';
+import RouterBridge from '../components/RouterBridge';
 
 export const metadata: Metadata = {
   title: "Hitha (හිත) - Privacy-First Mental Health Support Sri Lanka",
@@ -19,6 +20,7 @@ export default function RootLayout({
       <body className="antialiased">
         <QueryProvider>
           <AlertProvider>
+            <RouterBridge />
             {children}
           </AlertProvider>
         </QueryProvider>
