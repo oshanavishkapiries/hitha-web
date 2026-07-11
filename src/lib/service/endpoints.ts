@@ -18,6 +18,9 @@ export const ENDPOINTS = {
     approveDoctor: (id: string) => `/admin/doctors/${id}/approve`,
     rejectDoctor: (id: string) => `/admin/doctors/${id}/reject`,
     changeDoctorStatus: (id: string) => `/admin/doctors/${id}/status`,
+    pendingBlogs: "/admin/blogs/pending",
+    approveBlog: (id: string) => `/admin/blogs/${id}/approve`,
+    rejectBlog: (id: string) => `/admin/blogs/${id}/reject`,
   },
   doctor: {
     login: "/doctor/login",
@@ -37,6 +40,12 @@ export const ENDPOINTS = {
   },
   files: {
     upload: "/files/upload",
+  },
+  blogs: {
+    list: "/blogs",
+    detail: (id: string) => `/blogs/${id}`,
+    share: (id: string) => `/blogs/${id}/share`,
+    like: (id: string) => `/blogs/${id}/like`,
   },
   patients: {
     doctors: "/patients/doctors",

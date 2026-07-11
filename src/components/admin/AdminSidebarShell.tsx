@@ -11,11 +11,14 @@ import {
   IconLogout,
   IconChevronLeft,
   IconChevronRight,
+  IconClipboardCheck,
+  IconEdit,
+  IconArticle,
 } from '@tabler/icons-react';
-import { useDoctorApplications } from '../../lib/service/query/useAdmin';
+import { useDoctorApplications, usePendingBlogs } from '../../lib/service/query/useAdmin';
 
 interface AdminSidebarShellProps {
-  activeNav: 'overview' | 'doctors';
+  activeNav: 'overview' | 'doctors' | 'blogs-review' | 'blogs-mine' | 'blogs-all';
   title: string;
   subtitle: string;
   titleAction?: React.ReactNode;
@@ -35,6 +38,9 @@ export default function AdminSidebarShell({
 
   const { data: realDocs } = useDoctorApplications();
   const pendingCount = (realDocs || []).filter((doc: any) => doc.status === 'PENDING_VERIFICATION').length;
+
+  const { data: pendingBlogs } = usePendingBlogs();
+  const pendingBlogCount = (pendingBlogs || []).length;
 
   return (
     <div className="bg-[#FAF9F5] min-h-screen flex flex-row overflow-hidden" id="admin-dashboard-container">
@@ -141,6 +147,103 @@ export default function AdminSidebarShell({
                 </span>
               )}
             </div>
+
+            {!isSidebarCollapsed && (
+              <div className="pt-4 mt-2 border-t border-[#152B22] text-[9px] font-bold uppercase tracking-wider text-sprout/40 px-4">
+                Blogs
+              </div>
+            )}
+
+            <div className="relative">
+              <button
+                onClick={() => navigateTo('/admin/blogs/pending')}
+                className={`text-left rounded-xl text-xs font-semibold flex items-center transition-all duration-300 cursor-pointer ${
+                  isSidebarCollapsed ? 'justify-center p-3 w-12 h-12 mx-auto' : 'px-4 py-3 space-x-3 w-full'
+                } ${
+                  activeNav === 'blogs-review' ? 'bg-[#152B22] text-white font-bold border border-[#2B4E41]' : 'text-sprout/70 hover:bg-forest/20'
+                }`}
+                id="admin-tab-blogs-review"
+                title="Review Queue"
+              >
+                <IconClipboardCheck className="w-4 h-4 text-mint shrink-0" />
+                <AnimatePresence>
+                  {!isSidebarCollapsed && (
+                    <motion.div
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -8 }}
+                      transition={{ duration: 0.2, delay: 0.08 }}
+                      className="flex-1 flex justify-between items-center min-w-0"
+                    >
+                      <span className="truncate">Review Queue</span>
+                      {pendingBlogCount > 0 && (
+                        <span className="bg-red-500 text-white text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full shrink-0 ml-1">
+                          {pendingBlogCount}
+                        </span>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </button>
+              {isSidebarCollapsed && pendingBlogCount > 0 && (
+                <span className="absolute top-1 right-2 flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                </span>
+              )}
+            </div>
+
+            <button
+              onClick={() => navigateTo('/admin/blogs')}
+              className={`text-left rounded-xl text-xs font-semibold flex items-center transition-all duration-300 cursor-pointer ${
+                isSidebarCollapsed ? 'justify-center p-3 w-12 h-12 mx-auto' : 'px-4 py-3 space-x-3 w-full'
+              } ${
+                activeNav === 'blogs-mine' ? 'bg-[#152B22] text-white font-bold border border-[#2B4E41]' : 'text-sprout/70 hover:bg-forest/20'
+              }`}
+              id="admin-tab-blogs-mine"
+              title="Admin Articles"
+            >
+              <IconEdit className="w-4 h-4 text-mint shrink-0" />
+              <AnimatePresence>
+                {!isSidebarCollapsed && (
+                  <motion.span
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -8 }}
+                    transition={{ duration: 0.2, delay: 0.1 }}
+                    className="truncate"
+                  >
+                    Admin Articles
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </button>
+
+            <button
+              onClick={() => navigateTo('/admin/blogs/all')}
+              className={`text-left rounded-xl text-xs font-semibold flex items-center transition-all duration-300 cursor-pointer ${
+                isSidebarCollapsed ? 'justify-center p-3 w-12 h-12 mx-auto' : 'px-4 py-3 space-x-3 w-full'
+              } ${
+                activeNav === 'blogs-all' ? 'bg-[#152B22] text-white font-bold border border-[#2B4E41]' : 'text-sprout/70 hover:bg-forest/20'
+              }`}
+              id="admin-tab-blogs-all"
+              title="All Blogs"
+            >
+              <IconArticle className="w-4 h-4 text-mint shrink-0" />
+              <AnimatePresence>
+                {!isSidebarCollapsed && (
+                  <motion.span
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -8 }}
+                    transition={{ duration: 0.2, delay: 0.12 }}
+                    className="truncate"
+                  >
+                    All Blogs
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </button>
           </nav>
         </div>
 

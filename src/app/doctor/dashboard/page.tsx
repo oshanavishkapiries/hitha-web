@@ -3,11 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import AppShell from '../../../components/AppShell';
 import { navigateTo } from '../../../utils/navigation';
-import { 
-  LogOut, 
+import {
+  LogOut,
   RefreshCw,
   UserCircle2,
-  ArrowLeft
+  ArrowLeft,
+  BookOpen
 } from 'lucide-react';
 import {
   useDoctorSummary,
@@ -172,6 +173,35 @@ export default function DoctorDashboard() {
               </div>
               <div className="mt-4 flex items-center text-xs text-forest font-bold group-hover:underline">
                 <span>Manage Profile</span>
+                <ArrowLeft className="w-3.5 h-3.5 ml-1 rotate-180" />
+              </div>
+            </button>
+
+            <button
+              onClick={() => navigateTo('/doctor/blogs')}
+              className="bg-white border border-hairline hover:border-forest/30 shadow-resting hover:shadow-elevated p-6 rounded-2xl text-left transition-all cursor-pointer flex flex-col justify-between group min-h-48 h-auto"
+              id="doc-card-blogs"
+            >
+              <div className="space-y-4">
+                <div className="flex justify-between items-start">
+                  <div className="p-3 bg-mint/20 text-forest rounded-xl group-hover:bg-mint/30 transition-colors">
+                    <BookOpen className="w-6 h-6" />
+                  </div>
+                  <span className="text-[10px] uppercase font-bold text-forest bg-mint/20 px-2.5 py-0.5 rounded-full font-sans">
+                    Create
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-display font-bold text-forest text-base mb-1 group-hover:text-[#8FCB84] transition-colors">
+                    Wellness Blog
+                  </h3>
+                  <p className="text-xs text-ink-soft leading-relaxed">
+                    Write and publish mental health articles for patients, from draft through admin review.
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 flex items-center text-xs text-forest font-bold group-hover:underline">
+                <span>Manage Articles</span>
                 <ArrowLeft className="w-3.5 h-3.5 ml-1 rotate-180" />
               </div>
             </button>

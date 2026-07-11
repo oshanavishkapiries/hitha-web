@@ -1,6 +1,7 @@
 import axiosInstance from "../axios.client";
 import { ENDPOINTS } from "../endpoints";
 import { ApiResponse } from "./auth.service";
+import { BlogResponse } from "./blog.service";
 
 export interface AdminLoginRequest {
   identifier: string;
@@ -119,5 +120,25 @@ export const rejectDoctorApplication = async (id: string, reason: string): Promi
 export const changeDoctorStatusUnified = async (id: string, status: string, reason?: string): Promise<ApiResponse> => {
   const query = `?status=${encodeURIComponent(status)}${reason ? `&reason=${encodeURIComponent(reason)}` : ''}`;
   const response = await axiosInstance.post<ApiResponse>(`${ENDPOINTS.admin.changeDoctorStatus(id)}${query}`);
+  return response.data;
+};
+
+export interface GetPendingBlogsParams {
+  page?: number;
+  size?: number;
+}
+
+export const getPendingBlogs = async (params?: GetPendingBlogsParams): Promise<ApiResponse<BlogResponse[]>> => {
+  const response = await axiosInstance.get<ApiResponse<BlogResponse[]>>(ENDPOINTS.admin.pendingBlogs, { params });
+  return response.data;
+};
+
+export const approveBlog = async (id: string): Promise<ApiResponse> => {
+  const response = await axiosInstance.post<ApiResponse>(ENDPOINTS.admin.approveBlog(id));
+  return response.data;
+};
+
+export const rejectBlog = async (id: string, reason: string): Promise<ApiResponse> => {
+  const response = await axiosInstance.post<ApiResponse>(ENDPOINTS.admin.rejectBlog(id), { reason });
   return response.data;
 };

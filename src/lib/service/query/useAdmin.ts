@@ -7,6 +7,9 @@ import {
   approveDoctorApplication,
   rejectDoctorApplication,
   changeDoctorStatusUnified,
+  getPendingBlogs,
+  approveBlog,
+  rejectBlog,
 } from "../functions/admin.service";
 
 export const useDoctorApplications = () => {
@@ -92,6 +95,62 @@ export const useChangeDoctorStatus = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["doctor_applications"] });
+    },
+  });
+};
+
+export const usePendingBlogs = () => {
+  return useQuery({
+    queryKey: ["pending_blogs"],
+    queryFn: async () => {
+      const res = await getPendingBlogs({ size: 100 });
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch pending blogs");
+      }
+      const data = res.data as any;
+      if (Array.isArray(data)) {
+        return data;
+      }
+      if (data && typeof data === "object" && "content" in data && Array.isArray(data.content)) {
+        return data.content;
+      }
+      return [];
+    },
+  });
+};
+
+export const useApproveBlog = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await approveBlog(id);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to approve blog");
+      }
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["pending_blogs"] });
+      queryClient.invalidateQueries({ queryKey: ["blogs"] });
+    },
+  });
+};
+
+export const useRejectBlog = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, reason }: { id: string; reason: string }) => {
+      const res = await rejectBlog(id, reason);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to reject blog");
+      }
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["pending_blogs"] });
+      queryClient.invalidateQueries({ queryKey: ["blogs"] });
     },
   });
 };
