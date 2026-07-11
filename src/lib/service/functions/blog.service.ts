@@ -84,3 +84,22 @@ export const updateBlog = async (id: string, payload: BlogCreateRequest): Promis
   const response = await axiosInstance.put<ApiResponse<BlogSaveResponse>>(ENDPOINTS.blogs.detail(id), payload);
   return response.data;
 };
+
+export interface BlogLikeResponse {
+  liked: boolean;
+  likeCount: number;
+}
+
+export interface BlogShareResponse {
+  shareCount: number;
+}
+
+export const toggleLike = async (id: string): Promise<ApiResponse<BlogLikeResponse>> => {
+  const response = await axiosInstance.post<ApiResponse<BlogLikeResponse>>(ENDPOINTS.blogs.like(id));
+  return response.data;
+};
+
+export const trackShare = async (id: string): Promise<ApiResponse<BlogShareResponse>> => {
+  const response = await axiosInstance.post<ApiResponse<BlogShareResponse>>(ENDPOINTS.blogs.share(id));
+  return response.data;
+};

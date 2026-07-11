@@ -6,6 +6,8 @@ import {
   getBlog,
   createBlog,
   updateBlog,
+  toggleLike,
+  trackShare,
   GetBlogsParams,
   BlogCreateRequest,
 } from "../functions/blog.service";
@@ -94,6 +96,42 @@ export const useUpdateBlog = () => {
       queryClient.invalidateQueries({ queryKey: ["my_blogs"] });
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
       queryClient.invalidateQueries({ queryKey: ["blog", variables.id] });
+    },
+  });
+};
+
+export const useToggleLikeBlog = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await toggleLike(id);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to toggle like");
+      }
+      return res.data;
+    },
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: ["blog", id] });
+      queryClient.invalidateQueries({ queryKey: ["blogs"] });
+    },
+  });
+};
+
+export const useTrackShareBlog = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await trackShare(id);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to track share");
+      }
+      return res.data;
+    },
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: ["blog", id] });
+      queryClient.invalidateQueries({ queryKey: ["blogs"] });
     },
   });
 };

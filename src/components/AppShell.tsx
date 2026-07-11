@@ -7,7 +7,6 @@ import Navbar from './Navbar';
 import AdminNavbar from './AdminNavbar';
 import DoctorNavbar from './DoctorNavbar';
 import MyAppointmentsModal from './MyAppointmentsModal';
-import BlogsModal from './BlogsModal';
 import Footer from './Footer';
 import { navigateTo } from '../utils/navigation';
 
@@ -17,7 +16,6 @@ interface AppShellProps {
 
 export default function AppShell({ children }: AppShellProps) {
   const [showAppointments, setShowAppointments] = useState(false);
-  const [showBlogs, setShowBlogs] = useState(false);
   const pathname = usePathname() || "";
 
   const isAdminRoute = pathname.startsWith('/admin');
@@ -45,7 +43,7 @@ export default function AppShell({ children }: AppShellProps) {
       ) : (
         <Navbar 
           onOpenAppointments={() => setShowAppointments(true)}
-          onOpenBlogs={() => setShowBlogs(true)}
+          onOpenBlogs={() => navigateTo('/blog')}
         />
       )}
 
@@ -57,10 +55,6 @@ export default function AppShell({ children }: AppShellProps) {
       {/* Conditional Modals */}
       {showAppointments && (
         <MyAppointmentsModal onClose={() => setShowAppointments(false)} />
-      )}
-
-      {showBlogs && (
-        <BlogsModal onClose={() => setShowBlogs(false)} />
       )}
 
 
