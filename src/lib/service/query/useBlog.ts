@@ -11,16 +11,7 @@ import {
   GetBlogsParams,
   BlogCreateRequest,
 } from "../functions/blog.service";
-
-const normalizeList = (data: any): any[] => {
-  if (Array.isArray(data)) {
-    return data;
-  }
-  if (data && typeof data === "object" && Array.isArray(data.content)) {
-    return data.content;
-  }
-  return [];
-};
+import { normalizeList } from "./normalizeList";
 
 export const useBlogs = (params?: GetBlogsParams) => {
   return useQuery({

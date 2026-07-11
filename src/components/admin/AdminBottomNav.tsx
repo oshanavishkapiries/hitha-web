@@ -17,8 +17,35 @@ import { useDoctorApplications, usePendingBlogs } from '../../lib/service/query/
 
 type AdminNavKey = 'overview' | 'doctors' | 'blogs' | 'team';
 
+interface AdminNavItem {
+  key: AdminNavKey;
+  label: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  badge?: number;
+}
+
 interface AdminBottomNavProps {
   activeNav: AdminNavKey;
+}
+
+function QuickNavSlot({ item, isActive, onClick }: { item: AdminNavItem; isActive: boolean; onClick: () => void }) {
+  const Icon = item.icon;
+  return (
+    <button
+      onClick={onClick}
+      className="relative flex flex-col items-center justify-center gap-1 h-full cursor-pointer"
+      id={`admin-bottomnav-${item.key}`}
+    >
+      <Icon className={`w-5 h-5 ${isActive ? 'text-mint' : 'text-sprout/60'}`} />
+      <span className={`text-[9px] font-semibold ${isActive ? 'text-mint' : 'text-sprout/60'}`}>
+        {item.label.split(' ')[0]}
+      </span>
+      {!!item.badge && item.badge > 0 && (
+        <span className="absolute top-1.5 right-1/2 translate-x-3.5 h-2 w-2 rounded-full bg-red-500" />
+      )}
+    </button>
+  );
 }
 
 export default function AdminBottomNav({ activeNav }: AdminBottomNavProps) {
@@ -35,13 +62,7 @@ export default function AdminBottomNav({ activeNav }: AdminBottomNavProps) {
   const { data: pendingBlogs } = usePendingBlogs();
   const pendingBlogCount = (pendingBlogs || []).length;
 
-  const navItems: {
-    key: AdminNavKey;
-    label: string;
-    href: string;
-    icon: React.ComponentType<{ className?: string }>;
-    badge?: number;
-  }[] = [
+  const navItems: AdminNavItem[] = [
     { key: 'overview', label: 'Overview & Analytics', href: '/admin/dashboard', icon: IconTrendingUp },
     { key: 'doctors', label: 'Doctor Registry', href: '/admin/doctors', icon: IconStethoscope, badge: pendingCount },
     { key: 'blogs', label: 'Blogs', href: '/admin/blogs', icon: IconArticle, badge: pendingBlogCount },
@@ -66,26 +87,9 @@ export default function AdminBottomNav({ activeNav }: AdminBottomNavProps) {
         id="admin-bottom-nav"
       >
         <div className="grid grid-cols-5 items-center h-16">
-          {quickLeft.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeNav === item.key;
-            return (
-              <button
-                key={item.key}
-                onClick={() => go(item.href)}
-                className="relative flex flex-col items-center justify-center gap-1 h-full cursor-pointer"
-                id={`admin-bottomnav-${item.key}`}
-              >
-                <Icon className={`w-5 h-5 ${isActive ? 'text-mint' : 'text-sprout/60'}`} />
-                <span className={`text-[9px] font-semibold ${isActive ? 'text-mint' : 'text-sprout/60'}`}>
-                  {item.label.split(' ')[0]}
-                </span>
-                {!!item.badge && item.badge > 0 && (
-                  <span className="absolute top-1.5 right-1/2 translate-x-3.5 h-2 w-2 rounded-full bg-red-500" />
-                )}
-              </button>
-            );
-          })}
+          {quickLeft.map((item) => (
+            <QuickNavSlot key={item.key} item={item} isActive={activeNav === item.key} onClick={() => go(item.href)} />
+          ))}
 
           {/* Center hamburger */}
           <div className="flex items-center justify-center">
@@ -99,26 +103,9 @@ export default function AdminBottomNav({ activeNav }: AdminBottomNavProps) {
             </button>
           </div>
 
-          {quickRight.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeNav === item.key;
-            return (
-              <button
-                key={item.key}
-                onClick={() => go(item.href)}
-                className="relative flex flex-col items-center justify-center gap-1 h-full cursor-pointer"
-                id={`admin-bottomnav-${item.key}`}
-              >
-                <Icon className={`w-5 h-5 ${isActive ? 'text-mint' : 'text-sprout/60'}`} />
-                <span className={`text-[9px] font-semibold ${isActive ? 'text-mint' : 'text-sprout/60'}`}>
-                  {item.label.split(' ')[0]}
-                </span>
-                {!!item.badge && item.badge > 0 && (
-                  <span className="absolute top-1.5 right-1/2 translate-x-3.5 h-2 w-2 rounded-full bg-red-500" />
-                )}
-              </button>
-            );
-          })}
+          {quickRight.map((item) => (
+            <QuickNavSlot key={item.key} item={item} isActive={activeNav === item.key} onClick={() => go(item.href)} />
+          ))}
         </div>
       </nav>
 

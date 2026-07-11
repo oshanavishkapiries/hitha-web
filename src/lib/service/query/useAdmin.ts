@@ -20,6 +20,7 @@ import {
   AdminRole,
   GetAdminUsersParams,
 } from "../functions/admin.service";
+import { normalizeList } from "./normalizeList";
 
 export const useDoctorApplications = () => {
   return useQuery({
@@ -31,14 +32,7 @@ export const useDoctorApplications = () => {
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch doctor applications");
       }
-      const data = res.data as any;
-      if (Array.isArray(data)) {
-        return data;
-      }
-      if (data && typeof data === "object" && "content" in data && Array.isArray(data.content)) {
-        return data.content;
-      }
-      return [];
+      return normalizeList(res.data);
     },
   });
 };
@@ -116,14 +110,7 @@ export const usePendingBlogs = () => {
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch pending blogs");
       }
-      const data = res.data as any;
-      if (Array.isArray(data)) {
-        return data;
-      }
-      if (data && typeof data === "object" && "content" in data && Array.isArray(data.content)) {
-        return data.content;
-      }
-      return [];
+      return normalizeList(res.data);
     },
   });
 };
